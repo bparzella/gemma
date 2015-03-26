@@ -104,6 +104,9 @@ if __name__ == "__main__":
     #setup connection manager
     connectionManager = hsmsConnectionManager(postInitCallback = ceSetup)
 
+    #create database
+    db.create_all()
+
     # instanciate all configured tools
     for tool in Tool.query.all():
         #set default handler
@@ -200,9 +203,6 @@ if __name__ == "__main__":
     #register admin interface for tool table
     admin.add_view(ToolView(Tool, db.session))
     admin.add_view(ModelView(CollectionEvents, db.session))
-
-    #create database
-    db.create_all()
 
     #run webapp
     app.run(host="0.0.0.0", port=4999, debug=True, use_reloader=False, threaded=True)
