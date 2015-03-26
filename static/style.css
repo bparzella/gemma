@@ -1,0 +1,39 @@
+
+.tool {
+    padding: 10px;
+    margin: 5px;
+    border-radius: 5px;
+}
+
+.toolOnline {
+	background: #21DB21; 
+}
+
+.toolConnecting {
+	background: #FAAE20; 
+}
+
+.toolOffline {
+	background: #CCCCCC; 
+}
+
+a:link .tool {
+    color: #000000;
+}
+
+a:visited .tool {
+    color: #000000;
+}
+
+a:hover .tool {
+    color: #000000;
+}
+
+a:active .tool {
+    color: #000000;
+}
+
+.nopadding {
+   padding: 0 !important;
+   margin: 0 !important;
+}

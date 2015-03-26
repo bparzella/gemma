@@ -1,0 +1,4 @@
+secsgem
+flask
+flask-sqlalchemy
+flask-admin

@@ -1,0 +1,170 @@
+{% extends "layout.html" %}
+{% block body %}
+	<h2>Tool {{ tool.name }}</h2>
+
+	<h3>CEs
+		<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#ceCollapse" aria-expanded="false" aria-controls="ceCollapse">
+			Toggle
+		</button>
+	</h3> 
+	<div class="collapse" id="ceCollapse">
+		<div class="well">
+			<table class="table table-condensed table-hover" id="ceidtable">
+				<tr><th>CEID</th><th>Name</th><th>Data</th></tr>
+			</table>  	
+		</div>
+	</div>
+
+	<h3>SVIDs
+		<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#svidCollapse" aria-expanded="false" aria-controls="svidCollapse">
+			Toggle
+		</button>
+	</h3> 
+	<div class="collapse" id="svidCollapse">
+		<div class="well">
+			<table class="table table-condensed table-hover">
+				<tr><th>SVID</th><th>Name</th><th>Value</th><th></th></tr>
+ 				{% for svid in svids %}
+ 					<tr>
+ 						<td><small>{{ svid[0].value }}</small></td>
+ 						<td><small>{{ svid[1].value }}</small></td>
+ 						<td><small><span id="svid{{ svid[0].value }}">{{ svid[2].value }}</span></small></td>
+ 						<td><a id="refreshSVID{{ svid[0].value }}" href="{{ url_for('tools_sv', toolname=tool.name, svid=svid[0].value) }}"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></a></span></td>
+ 					</tr>
+					<script type="text/javascript">
+						$('#refreshSVID{{ svid[0].value }}').click(function(event){
+							event.preventDefault();
+							$('#svid{{ svid[0].value }}').load(this.href)
+						})
+					</script>
+				{% endfor %}
+			</table>  	
+		</div>
+	</div>
+
+	<h3>ECIDs
+		<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#ecidCollapse" aria-expanded="false" aria-controls="ecidCollapse">
+			Toggle
+		</button>
+	</h3>
+	<div class="collapse" id="ecidCollapse">
+		<div class="well">
+			<table class="table table-condensed table-hover">
+				<tr><th>ECID</th><th>Name</th><th>Min</th><th>Max</th><th>Def</th><th>Units</th><th>Value</th><th></th></tr>
+				{% for ecid in ecids %}
+					<tr>
+						<td><small>{{ ecid[0].value }}</small></td>
+						<td><small>{{ ecid[1].value }}</small></td>
+						<td><small>{{ ecid[2].value }}</small></td>
+						<td><small>{{ ecid[3].value }}</small></td>
+						<td><small>{{ ecid[4].value }}</small></td>
+						<td><small>{{ ecid[5].value }}</small></td>
+						<td><small><span id="valueECID{{ ecid[0].value }}"></span></small></td>
+						<td>
+							<a id="editECID{{ ecid[0].value }}" href="{{ url_for('tools_ec', toolname=tool.name, ecid=ecid[0].value) }}"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></a></span>
+							<a id="refreshECID{{ ecid[0].value }}" href="{{ url_for('tools_ec', toolname=tool.name, ecid=ecid[0].value) }}"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></a></span>
+						</td>
+					</tr>
+					<script type="text/javascript">
+						$('#refreshECID{{ ecid[0].value }}').click(function(event){
+							event.preventDefault();
+							$('#valueECID{{ ecid[0].value }}').load(this.href);
+						})
+
+						$('#editECID{{ ecid[0].value }}').click(function(event){
+							event.preventDefault();
+							$('#valueECID{{ ecid[0].value }}').html('<form id="formECID{{ ecid[0].value }}" action="{{ url_for("tools_ec", toolname=tool.name, ecid=ecid[0].value) }}"><input id="inputECID{{ ecid[0].value }}" type="text"></form>');
+							$("#inputECID{{ ecid[0].value }}").focus();
+
+							href=this.href;
+
+							$("#formECID{{ ecid[0].value }}" ).submit(function( event ) {
+								val = $("#inputECID{{ ecid[0].value }}").val();
+								$.post(href, 'value=' + val , function( data ) {
+									$('#valueECID{{ ecid[0].value }}').load(href);
+								});
+								event.preventDefault();
+							});
+						})
+					</script>
+				{% endfor %}
+			</table>  	
+		</div>
+	</div>
+
+	<h3>Terminal
+		<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#terminalCollapse" aria-expanded="false" aria-controls="terminalCollapse">
+			Toggle
+		</button>
+	</h3> 
+	<div class="collapse" id="terminalCollapse">
+		<div class="well">
+			<pre id="terminal"></pre>
+			<form id="formTerminal" action="{{ url_for("tools_terminal", toolname=tool.name, TID=0) }}"><input id="terminalText" class="form-control" type="text"></form>
+		</div>
+	</div>
+
+	<h3>Settings
+		<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#settingsCollapse" aria-expanded="false" aria-controls="settingsCollapse">
+			Toggle
+		</button>
+	</h3> 
+	<div class="collapse" id="settingsCollapse">
+		<div class="well">
+		</div>
+	</div>
+
+<script type="text/javascript">
+$(document).ready(function(){
+	function dataClick(e){
+    	console.log(e);
+    	if (e.currentTarget.innerHTML != "") return;
+    	if(e.currentTarget.contentEditable != null){
+	        $(e.currentTarget).attr("contentEditable",true);
+	    }
+	    else{
+        	$(e.currentTarget).append("<input type='text'>");
+    	}    
+	}
+
+	$("#formTerminal" ).submit(function( event ) {
+		val = $("#terminalText").val();
+		$.post("{{ url_for("tools_terminal", toolname=tool.name, TID=0) }}", 'text=' + val , function( data ) {
+			$('#terminal').append("&lt;0:" + val + "<br />");
+			$("#terminalText").val("");
+		});
+		event.preventDefault();
+	});
+
+	$(".ecValue").bind("click", dataClick);
+
+	function doComet() {
+	    $.getJSON('/tools/{{ tool.name }}/comet/' + Math.random().toString(36).substr(2, 8), function(events){
+        	$.each( events, function( index, event ){
+        		console.log(event);
+        		switch(event.event)
+        		{
+        			case "terminal":
+			        	$('#terminal').append("&gt;" + event.terminal + ":" + event.text + "<br />");
+        				break;
+        			case "collectionevent":
+        				valueText = "";
+        				$.each(event.values, function(index, value){
+        					valueText += value.name + "=" + value.value + "<br />"
+        				});
+        				$('#ceidtable tr:first').after('<tr><td><small>'+event.ceid+'</small></td><td><small>'+event.name+'</small></td><td><small>'+valueText+'</small></td></tr>');
+        				break;
+        			case "terminate":
+        				return;
+        				break;
+        		}
+	    	    doComet();
+			});
+    	});
+	}
+
+	doComet();
+});
+</script>
+
+{% endblock %}
