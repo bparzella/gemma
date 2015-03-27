@@ -56,7 +56,7 @@ admin = Admin(app)
 
 class ToolView(ModelView):
     form_overrides = dict(type=SelectField)
-    form_columns = ['name', 'type', 'passive', 'address', 'port', 'device_id', 'collection_events']
+    form_columns = ['name', 'type', 'passive', 'address', 'port', 'device_id', 'enabled', 'collection_events']
     form_args = dict(
         type = dict(
             choices = modules
@@ -75,6 +75,7 @@ class Tool(db.Model):
     address = db.Column(db.String(80))
     port = db.Column(db.Integer)
     device_id = db.Column(db.Integer)
+    enabled = db.Column(db.Boolean)
     collection_events = db.relationship('CollectionEvents', backref='tool', lazy='dynamic')
 
     def __repr__(self):
@@ -104,11 +105,11 @@ if __name__ == "__main__":
     #setup connection manager
     connectionManager = hsmsConnectionManager(postInitCallback = ceSetup)
 
-    #create database
-    db.create_all()
+    def addTool(tool):
+        #skip disabled tools
+        if not tool.enabled:
+            return
 
-    # instanciate all configured tools
-    for tool in Tool.query.all():
         #set default handler
         toolType = secsDefaultHandler
 
@@ -133,6 +134,13 @@ if __name__ == "__main__":
 
         peer.registeredCollectionEvents = ceids
 
+    #create database
+    db.create_all()
+
+    # instanciate all configured tools
+    for tool in Tool.query.all():
+        addTool(tool)
+
     #web functions
     @app.route("/tools/")
     def tools_list():
@@ -141,14 +149,56 @@ if __name__ == "__main__":
     @app.route("/tools/<toolname>")
     def tools_detail(toolname):
         peer = connectionManager[toolname]
+        tool = Tool.query.filter(Tool.name == toolname).first()
 
-        if peer == None:
-            abort(404)
+        if not peer.connection == None:
+            SVs = sorted(peer.listSVs(), key=lambda SV: SV[0].value)
+            ECs = sorted(peer.listECs(), key=lambda EC: EC[0].value)
+        else:
+            SVs = {}
+            ECs = {}
 
-        SVs = sorted(peer.listSVs(), key=lambda SV: SV[0].value)
-        ECs = sorted(peer.listECs(), key=lambda EC: EC[0].value)
+        return render_template("tools_detail.html", peer = peer, tool = tool, modules = modules, svids = SVs, ecids = ECs)
 
-        return render_template("tools_detail.html", tool = connectionManager[toolname], svids = SVs, ecids = ECs)
+    @app.route("/tools/<toolname>/update", methods=['POST'])
+    def tool_update(toolname):
+        if request.method == 'POST':
+            tool = Tool.query.filter(Tool.name == toolname).first()
+
+            restartRequired = False
+
+            formEnabled = (request.form["enabled"] == "true")
+            formType = request.form["type"]
+            formAddress = request.form["address"]
+            formPort = request.form["port"]
+            formDeviceID = request.form["deviceID"]
+            formPassive = (request.form["passive"] == "true")
+
+            if (not formEnabled == tool.enabled or
+                not formType == tool.type or
+                not formAddress == tool.address or
+                not formPort == tool.port or
+                not formDeviceID == tool.device_id or 
+                not formPassive == tool.passive):
+                restartRequired = True
+
+            tool.enabled = formEnabled
+            tool.type = formType
+            tool.address = formAddress
+            tool.port = formPort
+            tool.device_id = formDeviceID
+            tool.passive = formPassive
+
+            db.session.commit()
+
+            if connectionManager.hasConnectionTo(tool.name):
+                connectionManager.removePeer(tool.name, tool.address, tool.port, tool.device_id)
+
+            addTool(tool)
+
+            return "OK"
+        else:
+            return "NOGET"
 
     @app.route("/tools/<toolname>/comet/<queue>")
     def tools_comet(toolname, queue):

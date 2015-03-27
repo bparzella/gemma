@@ -6,11 +6,11 @@
 }
 
 .toolOnline {
-	background: #21DB21; 
+	background: #30FF7F; 
 }
 
 .toolConnecting {
-	background: #FAAE20; 
+	background: #3094FF; 
 }
 
 .toolOffline {
@@ -36,4 +36,11 @@ a:active .tool {
 .nopadding {
    padding: 0 !important;
    margin: 0 !important;
+}
+
+.row-eq-height {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display:         flex;
 }

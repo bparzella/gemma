@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
-	<h2>Tool {{ tool.name }}</h2>
+	<h2>Tool {{ tool.name }}<div class="pull-right"><button type="button" class="btn btn-default" data-toggle="modal" data-target="#toolSettings"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span></button></div></h2>
 
 	<h3>CEs
 		<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#ceCollapse" aria-expanded="false" aria-controls="ceCollapse">
@@ -104,15 +104,55 @@
 		</div>
 	</div>
 
-	<h3>Settings
-		<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#settingsCollapse" aria-expanded="false" aria-controls="settingsCollapse">
-			Toggle
-		</button>
-	</h3> 
-	<div class="collapse" id="settingsCollapse">
-		<div class="well">
-		</div>
-	</div>
+<!-- Modal -->
+<div class="modal fade" id="toolSettings" tabindex="-1" role="dialog" aria-labelledby="toolSettingsLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="toolSettingsLabel">Settings</h4>
+      </div>
+      <div class="modal-body">
+		<form id="formSettings" action="{{ url_for("tool_update", toolname=tool.name) }}">
+			<div class="checkbox">
+				<label>
+					<input type="checkbox" id="toolEnabled" {{ "checked" if tool.enabled }}> Enabled
+				</label>
+			</div>
+			<div class="form-group">
+				<label for="toolType">Type</label>
+				<select id="toolType" class="form-control">
+				{% for module in modules %}
+					<option value="{{ module[0] }}" {{ "selected" if module[0] == tool.type }}>{{ module[0] }}</option>
+				{% endfor %}
+				</select>
+         	</div>
+			<div class="form-group">
+				<label for="toolAddress">Address</label>
+				<input type="text" class="form-control" id="toolAddress" placeholder="192.168.1.1" value="{{ tool.address }}">
+				</div>
+			<div class="form-group">
+				<label for="toolPort">Port</label>
+				<input type="number" class="form-control" id="toolPort" placeholder="5000" value="{{ tool.port }}">
+				</div>
+			<div class="form-group">
+				<label for="toolDeviceID">Device ID</label>
+				<input type="number" class="form-control" id="toolDeviceID" placeholder="0" value="{{ tool.device_id }}">
+				</div>
+			<div class="checkbox">
+				<label>
+					<input type="checkbox" id="toolPassive" {{ "checked" if tool.passive }}> Passive
+				</label>
+			</div>
+		</form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" id="formSubmit" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script type="text/javascript">
 $(document).ready(function(){
@@ -127,26 +167,45 @@ $(document).ready(function(){
     	}    
 	}
 
+	$(".ecValue").bind("click", dataClick);
+
 	$("#formTerminal" ).submit(function( event ) {
+		event.preventDefault();
 		val = $("#terminalText").val();
 		$.post("{{ url_for("tools_terminal", toolname=tool.name, TID=0) }}", 'text=' + val , function( data ) {
 			$('#terminal').append("&lt;0:" + val + "<br />");
 			$("#terminalText").val("");
 		});
-		event.preventDefault();
 	});
 
-	$(".ecValue").bind("click", dataClick);
+	//$("#formSettings" ).submit(function( event ) {
+	$("#formSubmit").click(function(){
+		event.preventDefault();
+		toolEnabled = $("#toolEnabled").is(":checked");
+		toolType = $("#toolType").val();
+		toolAddress = $("#toolAddress").val();
+		toolPort = $("#toolPort").val();
+		toolDeviceID = $("#toolDeviceID").val();
+		toolPassive = $("#toolPassive").is(":checked");
+
+		$.post("{{ url_for("tool_update", toolname=tool.name) }}", { enabled: toolEnabled, type: toolType, address: toolAddress, port: toolPort, deviceID: toolDeviceID, passive: toolPassive  } , function( data ) {
+			if (data == "OK")
+			{
+			}
+		});
+
+		$("#toolSettings").modal('hide');
+	});
 
 	function doComet() {
-	    $.getJSON('/tools/{{ tool.name }}/comet/' + Math.random().toString(36).substr(2, 8), function(events){
-        	$.each( events, function( index, event ){
-        		console.log(event);
-        		switch(event.event)
-        		{
-        			case "terminal":
-			        	$('#terminal').append("&gt;" + event.terminal + ":" + event.text + "<br />");
-        				break;
+		$.getJSON('/tools/{{ tool.name }}/comet/' + Math.random().toString(36).substr(2, 8), function(events){
+			$.each( events, function( index, event ){
+				console.log(event);
+				switch(event.event)
+				{
+					case "terminal":
+						$('#terminal').append("&gt;" + event.terminal + ":" + event.text + "<br />");
+						break;
         			case "collectionevent":
         				valueText = "";
         				$.each(event.values, function(index, value){
