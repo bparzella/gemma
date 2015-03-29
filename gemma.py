@@ -151,7 +151,7 @@ if __name__ == "__main__":
         peer = connectionManager[toolname]
         tool = Tool.query.filter(Tool.name == toolname).first()
 
-        if not peer.connection == None:
+        if peer and peer.connection:
             SVs = sorted(peer.listSVs(), key=lambda SV: SV[0].value)
             ECs = sorted(peer.listECs(), key=lambda EC: EC[0].value)
         else:
@@ -182,6 +182,10 @@ if __name__ == "__main__":
                 not formPassive == tool.passive):
                 restartRequired = True
 
+            if restartRequired:
+                if connectionManager.hasConnectionTo(tool.name):
+                    connectionManager.removePeer(tool.name, tool.address, tool.port, tool.device_id)
+
             tool.enabled = formEnabled
             tool.type = formType
             tool.address = formAddress
@@ -191,10 +195,8 @@ if __name__ == "__main__":
 
             db.session.commit()
 
-            if connectionManager.hasConnectionTo(tool.name):
-                connectionManager.removePeer(tool.name, tool.address, tool.port, tool.device_id)
-
-            addTool(tool)
+            if restartRequired:
+                addTool(tool)
 
             return "OK"
         else:
@@ -228,6 +230,10 @@ if __name__ == "__main__":
         result = peer.requestSV(int(svid))
 
         print type(result)
+
+        if isinstance(result, list):
+            return str(result)
+
         return str(result.value)
 
     @app.route("/tools/<toolname>/ec/<ecid>", methods=['POST', 'GET'])
