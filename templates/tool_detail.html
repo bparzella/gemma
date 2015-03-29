@@ -148,7 +148,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" id="formSubmit" class="btn btn-primary">Save changes</button>
+        <button type="button" id="buttonSettingsSubmit" class="btn btn-primary">Save changes</button>
       </div>
     </div>
   </div>
@@ -156,19 +156,7 @@
 
 <script type="text/javascript">
 $(document).ready(function(){
-	function dataClick(e){
-    	console.log(e);
-    	if (e.currentTarget.innerHTML != "") return;
-    	if(e.currentTarget.contentEditable != null){
-	        $(e.currentTarget).attr("contentEditable",true);
-	    }
-	    else{
-        	$(e.currentTarget).append("<input type='text'>");
-    	}    
-	}
-
-	$(".ecValue").bind("click", dataClick);
-
+	//terminal functions
 	$("#formTerminal" ).submit(function( event ) {
 		event.preventDefault();
 		val = $("#terminalText").val();
@@ -178,6 +166,7 @@ $(document).ready(function(){
 		});
 	});
 
+	//settings functions
 	$("#buttonToolSettings").click(function(){
 		$.getJSON('{{ url_for("tool_settings_get", toolname=tool.name) }}', function(settings){
   			console.log(settings);
@@ -200,7 +189,7 @@ $(document).ready(function(){
 		}
 	});
 
-	$("#formSubmit").click(function(){
+	$("#buttonSettingsSubmit").click(function(){
     	$('#formSettings').submit();
     });
 
@@ -223,6 +212,7 @@ $(document).ready(function(){
 		$("#toolSettings").modal('hide');
 	});
 
+	//comet functions
 	function doComet() {
 		$.getJSON('/tools/{{ tool.name }}/comet/' + Math.random().toString(36).substr(2, 8), function(events){
 			$.each( events, function( index, event ){
