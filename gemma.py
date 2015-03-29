@@ -174,12 +174,23 @@ if __name__ == "__main__":
             formDeviceID = request.form["deviceID"]
             formPassive = (request.form["passive"] == "true")
 
-            if (not formEnabled == tool.enabled or
-                not formType == tool.type or
-                not formAddress == tool.address or
-                not formPort == tool.port or
-                not formDeviceID == tool.device_id or 
-                not formPassive == tool.passive):
+            if not formEnabled == tool.enabled:
+                logging.info("tool_update("+toolname+"): Enabled changed, reconnect required")
+                restartRequired = True
+            if not formType == tool.type:
+                logging.info("tool_update("+toolname+"): Type changed, reconnect required")
+                restartRequired = True
+            if not formAddress == tool.address:
+                logging.info("tool_update("+toolname+"): Address changed, reconnect required")
+                restartRequired = True
+            if not int(formPort) == tool.port:
+                logging.info("tool_update("+toolname+"): Port changed, reconnect required")
+                restartRequired = True
+            if not int(formDeviceID) == tool.device_id:
+                logging.info("tool_update("+toolname+"): DeviceID changed, reconnect required")
+                restartRequired = True
+            if not formPassive == tool.passive:
+                logging.info("tool_update("+toolname+"): Passice changed, reconnect required")
                 restartRequired = True
 
             if restartRequired:
