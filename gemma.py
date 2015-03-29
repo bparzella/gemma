@@ -160,8 +160,23 @@ if __name__ == "__main__":
 
         return render_template("tool_detail.html", peer = peer, tool = tool, modules = modules, svids = SVs, ecids = ECs)
 
-    @app.route("/tools/<toolname>/update", methods=['POST'])
-    def tool_update(toolname):
+    @app.route("/tools/<toolname>/settings/get")
+    def tool_settings_get(toolname):
+        settings = {}
+
+        tool = Tool.query.filter(Tool.name == toolname).first()
+
+        settings["enabled"] = tool.enabled
+        settings["type"] = tool.type
+        settings["address"] = tool.address
+        settings["port"] = tool.port
+        settings["deviceID"] = tool.device_id
+        settings["passive"] = tool.passive
+
+        return json.dumps(settings)
+
+    @app.route("/tools/<toolname>/settings/update", methods=['POST'])
+    def tool_settings_update(toolname):
         if request.method == 'POST':
             tool = Tool.query.filter(Tool.name == toolname).first()
 
@@ -175,22 +190,22 @@ if __name__ == "__main__":
             formPassive = (request.form["passive"] == "true")
 
             if not formEnabled == tool.enabled:
-                logging.info("tool_update("+toolname+"): Enabled changed, reconnect required")
+                logging.info("tool_settings_update("+toolname+"): Enabled changed, reconnect required")
                 restartRequired = True
             if not formType == tool.type:
-                logging.info("tool_update("+toolname+"): Type changed, reconnect required")
+                logging.info("tool_settings_update("+toolname+"): Type changed, reconnect required")
                 restartRequired = True
             if not formAddress == tool.address:
-                logging.info("tool_update("+toolname+"): Address changed, reconnect required")
+                logging.info("tool_settings_update("+toolname+"): Address changed, reconnect required")
                 restartRequired = True
             if not int(formPort) == tool.port:
-                logging.info("tool_update("+toolname+"): Port changed, reconnect required")
+                logging.info("tool_settings_update("+toolname+"): Port changed, reconnect required")
                 restartRequired = True
             if not int(formDeviceID) == tool.device_id:
-                logging.info("tool_update("+toolname+"): DeviceID changed, reconnect required")
+                logging.info("tool_settings_update("+toolname+"): DeviceID changed, reconnect required")
                 restartRequired = True
             if not formPassive == tool.passive:
-                logging.info("tool_update("+toolname+"): Passive changed, reconnect required")
+                logging.info("tool_settings_update("+toolname+"): Passive changed, reconnect required")
                 restartRequired = True
 
             if restartRequired:

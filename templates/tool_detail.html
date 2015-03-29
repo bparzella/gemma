@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
-	<h2>Tool {{ tool.name }}<div class="pull-right"><button type="button" class="btn btn-default" data-toggle="modal" title="Collection Events" data-target="#toolCollectionEvents"><span class="glyphicon glyphicon-bullhorn" aria-hidden="true"></span></button>&nbsp;<button type="button" class="btn btn-default" data-toggle="modal" title="Settings" data-target="#toolSettings"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span></button></div></h2>
+	<h2>Tool {{ tool.name }}<div class="pull-right"><button type="button" class="btn btn-default" data-toggle="modal" title="Collection Events" data-target="#toolCollectionEvents"><span class="glyphicon glyphicon-bullhorn" aria-hidden="true"></span></button>&nbsp;<button type="button" class="btn btn-default" title="Settings" id="buttonToolSettings"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span></button></div></h2>
 
 	<h3>CEs
 		<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#ceCollapse" aria-expanded="false" aria-controls="ceCollapse">
@@ -113,35 +113,35 @@
         <h4 class="modal-title" id="toolSettingsLabel">Settings</h4>
       </div>
       <div class="modal-body">
-		<form id="formSettings" action="{{ url_for("tool_update", toolname=tool.name) }}">
+		<form id="formSettings" action="{{ url_for("tool_settings_update", toolname=tool.name) }}">
 			<div class="checkbox">
 				<label>
-					<input type="checkbox" id="toolInputEnabled" {{ "checked" if tool.enabled }}> Enabled
+					<input type="checkbox" id="toolInputEnabled"> Enabled
 				</label>
 			</div>
 			<div class="form-group">
 				<label for="toolInputType">Type</label>
 				<select id="toolInputType" class="form-control">
 				{% for module in modules %}
-					<option value="{{ module[0] }}" {{ "selected" if module[0] == tool.type }}>{{ module[0] }}</option>
+					<option value="{{ module[0] }}">{{ module[0] }}</option>
 				{% endfor %}
 				</select>
          	</div>
 			<div class="form-group">
 				<label for="toolInputAddress">Address</label>
-				<input type="text" class="form-control toolInputSubmittable" id="toolInputAddress" placeholder="192.168.1.1" value="{{ tool.address }}">
+				<input type="text" class="form-control toolInputSubmittable" id="toolInputAddress" placeholder="192.168.1.1">
 				</div>
 			<div class="form-group">
 				<label for="toolInputPort">Port</label>
-				<input type="number" class="form-control toolInputSubmittable" id="toolInputPort" placeholder="5000" value="{{ tool.port }}">
+				<input type="number" class="form-control toolInputSubmittable" id="toolInputPort" placeholder="5000">
 				</div>
 			<div class="form-group">
 				<label for="toolInputDeviceID">Device ID</label>
-				<input type="number" class="form-control toolInputSubmittable" id="toolInputDeviceID" placeholder="0" value="{{ tool.device_id }}">
+				<input type="number" class="form-control toolInputSubmittable" id="toolInputDeviceID" placeholder="0">
 				</div>
 			<div class="checkbox">
 				<label>
-					<input type="checkbox" id="toolInputPassive" {{ "checked" if tool.passive }}> Passive
+					<input type="checkbox" id="toolInputPassive"> Passive
 				</label>
 			</div>
 		</form>
@@ -178,6 +178,21 @@ $(document).ready(function(){
 		});
 	});
 
+	$("#buttonToolSettings").click(function(){
+		$.getJSON('{{ url_for("tool_settings_get", toolname=tool.name) }}', function(settings){
+  			console.log(settings);
+
+  			$("#toolInputEnabled").prop('checked', settings.enabled);
+			$("#toolInputType").val(settings.type);
+			$("#toolInputAddress").val(settings.address);
+			$("#toolInputPort").val(settings.port);
+			$("#toolInputDeviceID").val(settings.deviceID);
+			$("#toolInputPassive").prop('checked', settings.passive);
+
+			$('#toolSettings').modal();
+  		});
+    });
+
 	$(".toolInputSubmittable").keydown(function (event) {
 		if(event.keyCode == 13)
 		{
@@ -191,6 +206,7 @@ $(document).ready(function(){
 
 	$("#formSettings" ).submit(function( event ) {
 		event.preventDefault();
+
 		toolEnabled = $("#toolInputEnabled").is(":checked");
 		toolType = $("#toolInputType").val();
 		toolAddress = $("#toolInputAddress").val();
@@ -198,7 +214,7 @@ $(document).ready(function(){
 		toolDeviceID = $("#toolInputDeviceID").val();
 		toolPassive = $("#toolInputPassive").is(":checked");
 
-		$.post("{{ url_for("tool_update", toolname=tool.name) }}", { enabled: toolEnabled, type: toolType, address: toolAddress, port: toolPort, deviceID: toolDeviceID, passive: toolPassive  } , function( data ) {
+		$.post("{{ url_for("tool_settings_update", toolname=tool.name) }}", { enabled: toolEnabled, type: toolType, address: toolAddress, port: toolPort, deviceID: toolDeviceID, passive: toolPassive  } , function( data ) {
 			if (data == "OK")
 			{
 			}
