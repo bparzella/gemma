@@ -190,7 +190,7 @@ if __name__ == "__main__":
                 logging.info("tool_update("+toolname+"): DeviceID changed, reconnect required")
                 restartRequired = True
             if not formPassive == tool.passive:
-                logging.info("tool_update("+toolname+"): Passice changed, reconnect required")
+                logging.info("tool_update("+toolname+"): Passive changed, reconnect required")
                 restartRequired = True
 
             if restartRequired:
