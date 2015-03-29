@@ -16,7 +16,7 @@
 				{% set toolState = "toolOnline" %}
 			{% endif %}		
 		{% endif %}		
-        <a href="{{ url_for('tools_detail', toolname=tool.name) }}"><div class="col-md-3 nopadding"><div class="tool {{ toolState }}"><h4>{{ tool.name }}</h4><br />{{ tool.type }}<br />{{ tool.address }}:{{ tool.port }}/{{ tool.device_id }}<br />{% if tool.passive %}passive{% else %}active{% endif %}</div></div></a>
+        <a href="{{ url_for('tool_detail', toolname=tool.name) }}"><div class="col-md-3 nopadding"><div class="tool {{ toolState }}"><h4>{{ tool.name }}</h4><br />{{ tool.type }}<br />{{ tool.address }}:{{ tool.port }}/{{ tool.device_id }}<br />{% if tool.passive %}passive{% else %}active{% endif %}</div></div></a>
       {% endfor %}
       </div>
     </div>

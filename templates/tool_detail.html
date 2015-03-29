@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
-	<h2>Tool {{ tool.name }}<div class="pull-right"><button type="button" class="btn btn-default" data-toggle="modal" title="Settings" data-target="#toolSettings"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span></button></div></h2>
+	<h2>Tool {{ tool.name }}<div class="pull-right"><button type="button" class="btn btn-default" data-toggle="modal" title="Collection Events" data-target="#toolCollectionEvents"><span class="glyphicon glyphicon-bullhorn" aria-hidden="true"></span></button>&nbsp;<button type="button" class="btn btn-default" data-toggle="modal" title="Settings" data-target="#toolSettings"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span></button></div></h2>
 
 	<h3>CEs
 		<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#ceCollapse" aria-expanded="false" aria-controls="ceCollapse">
@@ -29,7 +29,7 @@
  						<td><small>{{ svid[0].value }}</small></td>
  						<td><small>{{ svid[1].value }}</small></td>
  						<td><small><span id="svid{{ svid[0].value }}">{{ svid[2].value }}</span></small></td>
- 						<td><a id="refreshSVID{{ svid[0].value }}" href="{{ url_for('tools_sv', toolname=tool.name, svid=svid[0].value) }}"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></a></span></td>
+ 						<td><a id="refreshSVID{{ svid[0].value }}" href="{{ url_for('tool_sv', toolname=tool.name, svid=svid[0].value) }}"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></a></span></td>
  					</tr>
 					<script type="text/javascript">
 						$('#refreshSVID{{ svid[0].value }}').click(function(event){
@@ -61,8 +61,8 @@
 						<td><small>{{ ecid[5].value }}</small></td>
 						<td><small><span id="valueECID{{ ecid[0].value }}"></span></small></td>
 						<td>
-							<a id="editECID{{ ecid[0].value }}" href="{{ url_for('tools_ec', toolname=tool.name, ecid=ecid[0].value) }}"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></a></span>
-							<a id="refreshECID{{ ecid[0].value }}" href="{{ url_for('tools_ec', toolname=tool.name, ecid=ecid[0].value) }}"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></a></span>
+							<a id="editECID{{ ecid[0].value }}" href="{{ url_for('tool_ec', toolname=tool.name, ecid=ecid[0].value) }}"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></a></span>
+							<a id="refreshECID{{ ecid[0].value }}" href="{{ url_for('tool_ec', toolname=tool.name, ecid=ecid[0].value) }}"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></a></span>
 						</td>
 					</tr>
 					<script type="text/javascript">
@@ -73,7 +73,7 @@
 
 						$('#editECID{{ ecid[0].value }}').click(function(event){
 							event.preventDefault();
-							$('#valueECID{{ ecid[0].value }}').html('<form id="formECID{{ ecid[0].value }}" action="{{ url_for("tools_ec", toolname=tool.name, ecid=ecid[0].value) }}"><input id="inputECID{{ ecid[0].value }}" type="text"></form>');
+							$('#valueECID{{ ecid[0].value }}').html('<form id="formECID{{ ecid[0].value }}" action="{{ url_for("tool_ec", toolname=tool.name, ecid=ecid[0].value) }}"><input id="inputECID{{ ecid[0].value }}" type="text"></form>');
 							$("#inputECID{{ ecid[0].value }}").focus();
 
 							href=this.href;
@@ -100,7 +100,7 @@
 	<div class="collapse" id="terminalCollapse">
 		<div class="well">
 			<pre id="terminal"></pre>
-			<form id="formTerminal" action="{{ url_for("tools_terminal", toolname=tool.name, TID=0) }}"><input id="terminalText" class="form-control" type="text"></form>
+			<form id="formTerminal" action="{{ url_for("tool_terminal", toolname=tool.name, TID=0) }}"><input id="terminalText" class="form-control" type="text"></form>
 		</div>
 	</div>
 
@@ -172,7 +172,7 @@ $(document).ready(function(){
 	$("#formTerminal" ).submit(function( event ) {
 		event.preventDefault();
 		val = $("#terminalText").val();
-		$.post("{{ url_for("tools_terminal", toolname=tool.name, TID=0) }}", 'text=' + val , function( data ) {
+		$.post("{{ url_for("tool_terminal", toolname=tool.name, TID=0) }}", 'text=' + val , function( data ) {
 			$('#terminal').append("&lt;0:" + val + "<br />");
 			$("#terminalText").val("");
 		});

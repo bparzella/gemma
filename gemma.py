@@ -147,7 +147,7 @@ if __name__ == "__main__":
         return render_template("tools_list.html", tools = Tool.query.all(), connectionManager = connectionManager)
 
     @app.route("/tools/<toolname>")
-    def tools_detail(toolname):
+    def tool_detail(toolname):
         peer = connectionManager[toolname]
         tool = Tool.query.filter(Tool.name == toolname).first()
 
@@ -158,7 +158,7 @@ if __name__ == "__main__":
             SVs = {}
             ECs = {}
 
-        return render_template("tools_detail.html", peer = peer, tool = tool, modules = modules, svids = SVs, ecids = ECs)
+        return render_template("tool_detail.html", peer = peer, tool = tool, modules = modules, svids = SVs, ecids = ECs)
 
     @app.route("/tools/<toolname>/update", methods=['POST'])
     def tool_update(toolname):
@@ -214,7 +214,7 @@ if __name__ == "__main__":
             return "NOGET"
 
     @app.route("/tools/<toolname>/comet/<queue>")
-    def tools_comet(toolname, queue):
+    def tool_comet(toolname, queue):
         peer = connectionManager[toolname]
 
         if peer == None:
@@ -224,7 +224,7 @@ if __name__ == "__main__":
         return json.dumps(events)
 
     @app.route("/tools/<toolname>/terminal/<TID>", methods=['POST', 'GET'])
-    def tools_terminal(toolname, TID):
+    def tool_terminal(toolname, TID):
         peer = connectionManager[toolname]
 
         if peer == None:
@@ -236,7 +236,7 @@ if __name__ == "__main__":
         return "OK"
 
     @app.route("/tools/<toolname>/sv/<svid>")
-    def tools_sv(toolname, svid):
+    def tool_sv(toolname, svid):
         peer = connectionManager[toolname]
         result = peer.requestSV(int(svid))
 
@@ -248,7 +248,7 @@ if __name__ == "__main__":
         return str(result.value)
 
     @app.route("/tools/<toolname>/ec/<ecid>", methods=['POST', 'GET'])
-    def tools_ec(toolname, ecid):
+    def tool_ec(toolname, ecid):
         peer = connectionManager[toolname]
         if request.method == 'POST':
             result = peer.requestEC(int(ecid))
