@@ -9,15 +9,76 @@ function updateCollectionEventsTable() {
         $.each(collectionEvents, function(i, collectionEvent) {
             dvTable = "<table class='table table-condensed'>";
             $.each(collectionEvent["DVIDs"], function(i, dataValue) {
-                deleteDVID = 'deleteDataValue' + dataValue["ID"] + 'ForCE' + collectionEvent["ID"];
-                dvTable += "<tr><td>" + dataValue["ID"] + ':' + dataValue["name"] + '<div class="pull-right"><button type="button" class="btn btn-default btn-xs" id="' + deleteDVID + '"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button></div></td></tr><script type="text/javascript">$("#' + deleteDVID + '").click(function(){deleteDV(' + collectionEvent["ID"] + ', ' + dataValue["ID"] + ');});<\/script>'
+                dvTable += Handlebars.compile(' \
+                    <tr> \
+                        <td> \
+                            {{ handlebar_tag("dvid") }}:{{ handlebar_tag("dvname") }} \
+                            <div class="pull-right"> \
+                                <button type="button" class="btn btn-default btn-xs" id="deleteDataValue{{ handlebar_tag("dvid") }}ForCE{{ handlebar_tag("ceid") }}"> \
+                                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> \
+                                </button> \
+                            </div> \
+                        </td> \
+                    </tr> \
+                    <script type="text/javascript"> \
+                        $("#deleteDataValue{{ handlebar_tag("dvid") }}ForCE{{ handlebar_tag("ceid") }}").click(function(){ \
+                            deleteDV({{ handlebar_tag("ceid") }}, {{ handlebar_tag("dvid") }}); \
+                        }); \
+                    <\/script>')({dvid: dataValue["ID"], dvname: dataValue["name"], ceid: collectionEvent["ID"]});
             });
-            dvTable += '<tr><td><div class="pull-right"><button type="button" class="btn btn-default btn-xs" id="newDataValue' + collectionEvent["ID"] +'"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button></div></td></tr><script type="text/javascript">$("#newDataValue' + collectionEvent["ID"] +'").click(function(){newDV(' + collectionEvent["ID"] + ');});<\/script>'
+
+            dvTable += Handlebars.compile(' \
+                <tr> \
+                    <td> \
+                        <div class="pull-right"> \
+                            <button type="button" class="btn btn-default btn-xs" id="newDataValue{{ handlebar_tag("ceid") }}"> \
+                                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> \
+                            </button> \
+                        </div> \
+                    </td> \
+                </tr> \
+                <script type="text/javascript"> \
+                    $("#newDataValue{{ handlebar_tag("ceid") }}").click(function(){ \
+                        newDV({{ handlebar_tag("ceid") }});}); \
+                <\/script>')({ceid: collectionEvent["ID"]});
+
             dvTable += "</table>";
-            deleteCEID = 'deleteCollectionEvent' + collectionEvent["ID"];
-            $('#toolCollectionEventsTable > tbody:last').append('<tr><td>' + collectionEvent["ID"] + ':' + collectionEvent["name"] + '</td><td>' + dvTable + '</td><td><div class="pull-right"><button type="button" class="btn btn-default btn-xs" id="' + deleteCEID + '"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button></div></td></tr><script type="text/javascript">$("#' + deleteCEID + '").click(function(){deleteCE(' + collectionEvent["ID"] + ');});<\/script>');
+
+            $('#toolCollectionEventsTable > tbody:last').append(Handlebars.compile(' \
+                <tr> \
+                    <td>{{ handlebar_tag("ceid") }}:{{ handlebar_tag("cename") }}</td> \
+                    <td>{{ handlebar_tag_raw("dvTable") }}</td> \
+                    <td> \
+                        <div class="pull-right"> \
+                            <button type="button" class="btn btn-default btn-xs" id="deleteCollectionEvent{{ handlebar_tag("ceid") }}"> \
+                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> \
+                            </button> \
+                        </div> \
+                    </td> \
+                </tr> \
+                <script type="text/javascript"> \
+                    $("#deleteCollectionEvent{{ handlebar_tag("ceid") }}").click(function(){ \
+                        deleteCE({{ handlebar_tag("ceid") }}); \
+                    }); \
+                <\/script>')({ceid: collectionEvent["ID"], cename: collectionEvent["name"], dvTable: dvTable}));
         });
-        $('#toolCollectionEventsTable > tbody:last').append('<tr><td></td><td></td><td><div class="pull-right"><button type="button" class="btn btn-default btn-xs" id="newCollectionEvent"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button></div></td></tr><script type="text/javascript">$("#newCollectionEvent").click(function(){newCE();});<\/script>');
+        $('#toolCollectionEventsTable > tbody:last').append(' \
+            <tr> \
+                <td></td> \
+                <td></td> \
+                <td> \
+                    <div class="pull-right"> \
+                        <button type="button" class="btn btn-default btn-xs" id="newCollectionEvent"> \
+                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> \
+                        </button> \
+                    </div> \
+                </td> \
+            </tr> \
+            <script type="text/javascript"> \
+                $("#newCollectionEvent").click(function(){ \
+                    newCE(); \
+                }); \
+            <\/script>');
     });
 }
 
