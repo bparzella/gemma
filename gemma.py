@@ -158,6 +158,12 @@ if __name__ == "__main__":
     for tool in Tool.query.all():
         addTool(tool)
 
+    @app.context_processor
+    def utility_processor():
+        def handlebar_tag(tag):
+            return '{{' + tag + '}}'
+        return dict(handlebar_tag=handlebar_tag)
+
     #web functions
     @app.route("/tools/")
     def tools_list():
@@ -268,6 +274,19 @@ if __name__ == "__main__":
 
         return json.dumps(collectionEvents)
 
+    @app.route("/tools/<toolname>/settings/collectionevents/available")
+    def tool_settings_collectionevent_available(toolname):
+        tool = Tool.query.filter(Tool.name == toolname).first()
+        toolType = getToolType(tool)
+
+        ceids = []
+        for ceid in toolType.ceids:
+            ce = {"id": str(ceid)}
+            ce.update(toolType.ceids[ceid])
+            ceids.append(ce)
+
+        return json.dumps(ceids)
+
     @app.route("/tools/<toolname>/settings/collectionevents/create", methods=["POST"])
     def tool_settings_collectionevent_create(toolname):
         if request.method == 'POST':
@@ -300,6 +319,21 @@ if __name__ == "__main__":
                 return "OK"
 
         return "NOTFOUND"
+
+    @app.route("/tools/<toolname>/settings/collectionevents/<ceid>/dataValue/available")
+    def tool_settings_datavalue_available(toolname, ceid):
+        tool = Tool.query.filter(Tool.name == toolname).first()
+        toolType = getToolType(tool)
+
+        dvids = []
+        for ceidIterator in toolType.ceids:
+            if int(ceidIterator) == int(ceid):
+                for dvid in toolType.ceids[ceidIterator]["dv"]:
+                    dv = {"id": str(dvid)}
+                    dv.update(toolType.dvs[dvid])
+                    dvids.append(dv)
+
+        return json.dumps(dvids)
 
     @app.route("/tools/<toolname>/settings/collectionevents/<ceid>/dataValue/create", methods=["POST"])
     def tool_settings_collectionevent_datavalue_create(toolname, ceid):

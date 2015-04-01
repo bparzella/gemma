@@ -22,21 +22,43 @@ function updateCollectionEventsTable() {
 }
 
 function deleteDV(ceid, dvid) {
-    $.get('/tools/{{ tool.name }}/settings/collectionevents/' + ceid + '/dataValue/' + dvid + '/delete', function(events){
+    $.get('{{ url_for("tool_settings_collectionevent_datavalue_delete", toolname=tool.name, ceid="##ceid##", dvid="##dvid##", _external=True) }}'.replace(escape("##ceid##"), ceid).replace(escape("##dvid##"), dvid), function(events){
         updateCollectionEventsTable();
     });
 }
 
 function deleteCE(ceid) {
-    $.get('/tools/{{ tool.name }}/settings/collectionevents/' + ceid + '/delete', function(events){
+    $.get('{{ url_for("tool_settings_collectionevent_delete", toolname=tool.name, ceid="##ceid##", _external=True) }}'.replace(escape("##ceid##"), ceid), function(events){
         updateCollectionEventsTable();
     });
+}
+
+function idSorter(a, b) {
+  return a.id - b.id;
 }
 
 function newCE() {
     $("#toolInputNewCollectionEvent").val("");
 
-    $("#toolInputNewCollectionEvent").focus();
+    var availableCEs = new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('id', 'name'),
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        sorter: idSorter,
+        limit: 20,
+        prefetch: '{{ url_for("tool_settings_collectionevent_available", toolname=tool.name, _external=True) }}'
+    });
+ 
+    availableCEs.initialize();
+ 
+    $('#toolInputNewCollectionEvent').typeahead(null, {
+        name: 'availableCEs',
+        displayKey: 'id',
+        source: availableCEs.ttAdapter(),
+        templates: {
+            suggestion: Handlebars.compile('<p><strong>{{ handlebar_tag("id") }}</strong> – {{ handlebar_tag("name") }}</p>')
+        }
+    });
+
     $('#toolNewCollectionEvent').modal();
 }
 
@@ -44,7 +66,25 @@ function newDV(ceid) {
     $("#toolInputNewDataValue").val("");
     $("#toolInputCollectionEvent").val(ceid)
 
-    $("#toolInputNewDataValue").focus();
+    var availableDVs = new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('id', 'name'),
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        sorter: idSorter,
+        limit: 20,
+        prefetch: '{{ url_for("tool_settings_datavalue_available", toolname=tool.name, ceid="##ceid##", _external=True) }}'.replace(escape("##ceid##"), ceid)
+    });
+ 
+    availableDVs.initialize();
+ 
+    $('#toolInputNewDataValue').typeahead(null, {
+        name: 'availableDVs',
+        displayKey: 'id',
+        source: availableDVs.ttAdapter(),
+        templates: {
+            suggestion: Handlebars.compile('<p><strong>{{ handlebar_tag("id") }}</strong> – {{ handlebar_tag("name") }}</p>')
+        }
+    });
+
     $('#toolNewDataValue').modal();
 }
 
@@ -108,8 +148,17 @@ $(document).ready(function(){
         $("#toolSettings").modal('hide');
     });
 
+    //new collection event modal
     $("#buttonNewCollectionEventSubmit").click(function(){
         $('#formNewCollectionEvent').submit();
+    });
+
+    $('#toolNewCollectionEvent').on('shown.bs.modal', function () {
+        $("#toolInputNewCollectionEvent").focus();
+    });
+
+    $('#toolNewCollectionEvent').on('hidden.bs.modal', function () {
+        $('#toolInputNewCollectionEvent').typeahead('destroy');
     });
 
     $("#formNewCollectionEvent" ).submit(function( event ) {
@@ -131,8 +180,17 @@ $(document).ready(function(){
         });
     });
 
+    //new data value modal
     $("#buttonNewDataValueSubmit").click(function(){
         $('#formNewDataValue').submit();
+    });
+
+    $('#toolNewDataValue').on('shown.bs.modal', function () {
+        $("#toolInputNewDataValue").focus();
+    });
+
+    $('#toolNewDataValue').on('hidden.bs.modal', function () {
+        $('#toolInputNewDataValue').typeahead('destroy');
     });
 
     $("#formNewDataValue" ).submit(function( event ) {
@@ -145,7 +203,7 @@ $(document).ready(function(){
             return;
         }
 
-        $.post("/tools/{{ tool.name }}/settings/collectionevents/" + ceid + "/dataValue/create", { dvid: newDVID } , function( data ) {
+        $.post('{{ url_for("tool_settings_collectionevent_datavalue_create", toolname=tool.name, ceid="##ceid##", _external=True) }}'.replace(escape("##ceid##"), ceid), { dvid: newDVID } , function( data ) {
             if (data == "OK")
             {
                 $("#toolNewDataValue").modal('hide');
@@ -157,7 +215,7 @@ $(document).ready(function(){
 
     //comet functions
     function doComet() {
-        $.getJSON('/tools/{{ tool.name }}/comet/' + Math.random().toString(36).substr(2, 8), function(events){
+        $.getJSON('{{ url_for("tool_comet", toolname=tool.name, queue="##queue##", _external=True) }}'.replace(escape("##queue##"), Math.random().toString(36).substr(2, 8)), function(events){
             $.each( events, function( index, event ){
                 console.log(event);
                 switch(event.event)
@@ -376,7 +434,7 @@ $(document).ready(function(){
         <form id="formNewCollectionEvent">
             <div class="form-group">
                 <label for="toolInputNewCollectionEvent">CEID</label>
-                <input type="text" class="form-control toolInputNewCollectionEventSubmittable" id="toolInputNewCollectionEvent" placeholder="0">
+                <input type="text" class="form-control toolInputNewCollectionEventSubmittable typeahead" id="toolInputNewCollectionEvent" placeholder="0">
             </div>
         </form>
       </div>
@@ -400,7 +458,7 @@ $(document).ready(function(){
         <form id="formNewDataValue">
             <div class="form-group">
                 <label for="toolInputNewDataValue">DVID</label>
-                <input type="text" class="form-control toolInputNewDataValueSubmittable" id="toolInputNewDataValue" placeholder="0">
+                <input type="text" class="form-control toolInputNewDataValueSubmittable typeahead" id="toolInputNewDataValue" placeholder="0">
             </div>
             <input type="hidden" id="toolInputCollectionEvent" value="-1">
         </form>
