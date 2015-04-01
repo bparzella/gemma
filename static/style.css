@@ -44,3 +44,10 @@ a:active .tool {
   display: -ms-flexbox;
   display:         flex;
 }
+
+#toolCollectionEventsTable {
+     margin-bottom: 0px;
+ }
+#toolCollectionEventsTable table {
+     margin-bottom: 0px;
+ }

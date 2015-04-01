@@ -76,28 +76,36 @@ class Tool(db.Model):
     port = db.Column(db.Integer)
     device_id = db.Column(db.Integer)
     enabled = db.Column(db.Boolean)
-    collection_events = db.relationship('CollectionEvents', backref='tool', lazy='dynamic')
+    collection_events = db.relationship('CollectionEvent', backref='tool', lazy='dynamic', cascade="all, delete, delete-orphan")
 
     def __repr__(self):
         return self.name
 
-class CollectionEvents(db.Model):
+class CollectionEvent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     tool_id = db.Column(db.Integer, db.ForeignKey('tool.id'), nullable=False)
     ceid = db.Column(db.Integer)
+    dvs = db.relationship('DataValue', backref='collection_event', lazy='dynamic', cascade="all, delete, delete-orphan")
 
     def __repr__(self):
         return str(self.ceid)
 
-def ceSetup(peer):
+class DataValue(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    ce_id = db.Column(db.Integer, db.ForeignKey('collection_event.id'), nullable=False)
+    dvid = db.Column(db.Integer)
 
+    def __repr__(self):
+        return str(self.dvid)
+
+def ceSetup(peer):
     peer.clearCollectionEvents()
 
-    peer.subscribeCollectionEvent(0, peer.ceids[0]["dv"])
-    peer.subscribeCollectionEvent(6, peer.ceids[6]["dv"])
     for collectionEvent in peer.registeredCollectionEvents:
-        if collectionEvent in peer.ceids:
-            peer.subscribeCollectionEvent(collectionEvent, peer.ceids[collectionEvent]["dv"])
+        ceid = collectionEvent[0]
+        dvids = collectionEvent[1]
+        if ceid in peer.ceids:
+            peer.subscribeCollectionEvent(ceid, dvids)
         else:
             print "configured ceid %d not found" % (collectionEvent)
 
@@ -105,13 +113,9 @@ if __name__ == "__main__":
     #setup connection manager
     connectionManager = hsmsConnectionManager(postInitCallback = ceSetup)
 
-    def addTool(tool):
-        #skip disabled tools
-        if not tool.enabled:
-            return
-
+    def getToolType(tool):
         #set default handler
-        toolType = secsDefaultHandler
+        toolType = gemDefaultHandler
 
         #check if module loaded for tooltype
         if tool.type in globals():
@@ -125,12 +129,25 @@ if __name__ == "__main__":
                 if issubclass(classType, secsDefaultHandler):
                     toolType = classType
 
+        return toolType
+
+    def addTool(tool):
+        #skip disabled tools
+        if not tool.enabled:
+            return
+
+        toolType = getToolType(tool)
+
         #add configured tool to the connectionmanager
         peer = connectionManager.addPeer(tool.name, tool.address, tool.port, tool.passive, tool.device_id, toolType)
 
         ceids = []
         for collection_event in tool.collection_events:
-            ceids.append(collection_event.ceid)
+            dvids = []
+            for data_value in collection_event.dvs:
+                dvids.append(data_value.dvid)
+
+            ceids.append((collection_event.ceid, dvids))
 
         peer.registeredCollectionEvents = ceids
 
@@ -160,24 +177,22 @@ if __name__ == "__main__":
 
         return render_template("tool_detail.html", peer = peer, tool = tool, modules = modules, svids = SVs, ecids = ECs)
 
-    @app.route("/tools/<toolname>/settings/get")
-    def tool_settings_get(toolname):
-        settings = {}
+    @app.route("/tools/<toolname>/settings", methods=['GET', 'POST'])
+    def tool_settings(toolname):
+        if request.method == 'GET':
+            settings = {}
 
-        tool = Tool.query.filter(Tool.name == toolname).first()
+            tool = Tool.query.filter(Tool.name == toolname).first()
 
-        settings["enabled"] = tool.enabled
-        settings["type"] = tool.type
-        settings["address"] = tool.address
-        settings["port"] = tool.port
-        settings["deviceID"] = tool.device_id
-        settings["passive"] = tool.passive
+            settings["enabled"] = tool.enabled
+            settings["type"] = tool.type
+            settings["address"] = tool.address
+            settings["port"] = tool.port
+            settings["deviceID"] = tool.device_id
+            settings["passive"] = tool.passive
 
-        return json.dumps(settings)
-
-    @app.route("/tools/<toolname>/settings/update", methods=['POST'])
-    def tool_settings_update(toolname):
-        if request.method == 'POST':
+            return json.dumps(settings)
+        elif request.method == 'POST':
             tool = Tool.query.filter(Tool.name == toolname).first()
 
             restartRequired = False
@@ -228,6 +243,102 @@ if __name__ == "__main__":
         else:
             return "NOGET"
 
+    @app.route("/tools/<toolname>/settings/collectionevents/")
+    def tool_settings_collectionevents(toolname):
+        collectionEvents = []
+
+        tool = Tool.query.filter(Tool.name == toolname).first()
+        toolType = getToolType(tool)
+
+        for collection_event in tool.collection_events:
+            collectionEvent = {}
+            collectionEvent["ID"] = collection_event.ceid
+            collectionEvent["name"] = toolType.ceids[collection_event.ceid]["name"]
+
+            dataValues = []
+            for dv in collection_event.dvs:
+                dataValue = {}
+                dataValue["ID"] = dv.dvid
+                dataValue["name"] = toolType.dvs[dv.dvid]["name"]
+                dataValues.append(dataValue)
+
+            collectionEvent["DVIDs"] = dataValues
+
+            collectionEvents.append(collectionEvent)
+
+        return json.dumps(collectionEvents)
+
+    @app.route("/tools/<toolname>/settings/collectionevents/create", methods=["POST"])
+    def tool_settings_collectionevent_create(toolname):
+        if request.method == 'POST':
+            tool = Tool.query.filter(Tool.name == toolname).first()
+
+            ceid = request.form["ceid"]
+
+            for collection_event in tool.collection_events:
+                if int(collection_event.ceid) == int(ceid):
+                    return "EXISTING"
+
+            ce = CollectionEvent(ceid=ceid)
+            ce.tool = tool
+
+            db.session.add(ce)
+            db.session.commit()
+
+            return "OK"
+        else:
+            return "ILLEGAL_REQUEST " + request.method
+
+    @app.route("/tools/<toolname>/settings/collectionevents/<ceid>/delete")
+    def tool_settings_collectionevent_delete(toolname, ceid):
+        tool = Tool.query.filter(Tool.name == toolname).first()
+
+        for collection_event in tool.collection_events:
+            if int(collection_event.ceid) == int(ceid):
+                db.session.delete(collection_event)
+                db.session.commit()
+                return "OK"
+
+        return "NOTFOUND"
+
+    @app.route("/tools/<toolname>/settings/collectionevents/<ceid>/dataValue/create", methods=["POST"])
+    def tool_settings_collectionevent_datavalue_create(toolname, ceid):
+        if request.method == 'POST':
+            tool = Tool.query.filter(Tool.name == toolname).first()
+
+            dvid = request.form["dvid"]
+
+            for collection_event in tool.collection_events:
+                if int(collection_event.ceid) == int(ceid):
+                    for dv in collection_event.dvs:
+                        if int(dv.dvid) == int(dvid):
+                            return "EXISTING"
+
+                    dv = DataValue(dvid=dvid, ce_id=collection_event.id)
+
+                    db.session.add(dv)
+                    db.session.commit()
+
+                    return "OK"
+
+            return "NOCE"
+        else:
+            return "ILLEGAL_REQUEST " + request.method
+
+    @app.route("/tools/<toolname>/settings/collectionevents/<ceid>/dataValue/<dvid>/delete")
+    def tool_settings_collectionevent_datavalue_delete(toolname, ceid, dvid):
+        tool = Tool.query.filter(Tool.name == toolname).first()
+
+        for collection_event in tool.collection_events:
+            if int(collection_event.ceid) == int(ceid):
+                for dv in collection_event.dvs:
+                    if int(dv.dvid) == int(dvid):
+                        db.session.delete(dv)
+                        db.session.commit()
+                        return "OK"
+
+        return "NOTFOUND"
+
     @app.route("/tools/<toolname>/comet/<queue>")
     def tool_comet(toolname, queue):
         peer = connectionManager[toolname]
@@ -254,8 +365,6 @@ if __name__ == "__main__":
     def tool_sv(toolname, svid):
         peer = connectionManager[toolname]
         result = peer.requestSV(int(svid))
-
-        print type(result)
 
         if isinstance(result, list):
             return str(result)
@@ -284,7 +393,8 @@ if __name__ == "__main__":
 
     #register admin interface for tool table
     admin.add_view(ToolView(Tool, db.session))
-    admin.add_view(ModelView(CollectionEvents, db.session))
+    admin.add_view(ModelView(CollectionEvent, db.session))
+    admin.add_view(ModelView(DataValue, db.session))
 
     #run webapp
     app.run(host="0.0.0.0", port=4999, debug=True, use_reloader=False, threaded=True)
