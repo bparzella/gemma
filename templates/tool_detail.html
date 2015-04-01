@@ -3,292 +3,291 @@
 <script type="text/javascript">
 
 function updateCollectionEventsTable() {
+    $.getJSON('{{ url_for("tool_settings_collectionevents", toolname=tool.name) }}', function(collectionEvents){
+        $('#toolCollectionEventsTable').find('tbody').empty();
 
-	$.getJSON('{{ url_for("tool_settings_collectionevents", toolname=tool.name) }}', function(collectionEvents){
-		$('#toolCollectionEventsTable').find('tbody').empty();
-		
-		$.each(collectionEvents, function(i, collectionEvent) {
-			dvTable = "<table class='table table-condensed'>";
-			$.each(collectionEvent["DVIDs"], function(i, dataValue) {
-				deleteDVID = 'deleteDataValue' + dataValue["ID"] + 'ForCE' + collectionEvent["ID"];
-				dvTable += "<tr><td>" + dataValue["ID"] + ':' + dataValue["name"] + '<div class="pull-right"><button type="button" class="btn btn-default btn-xs" id="' + deleteDVID + '"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button></div></td></tr><script type="text/javascript">$("#' + deleteDVID + '").click(function(){deleteDV(' + collectionEvent["ID"] + ', ' + dataValue["ID"] + ');});<\/script>'
-			});
-			dvTable += '<tr><td><div class="pull-right"><button type="button" class="btn btn-default btn-xs" id="newDataValue' + collectionEvent["ID"] +'"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button></div></td></tr><script type="text/javascript">$("#newDataValue' + collectionEvent["ID"] +'").click(function(){newDV(' + collectionEvent["ID"] + ');});<\/script>'
-			dvTable += "</table>";
-			deleteCEID = 'deleteCollectionEvent' + collectionEvent["ID"];
-	 		$('#toolCollectionEventsTable > tbody:last').append('<tr><td>' + collectionEvent["ID"] + ':' + collectionEvent["name"] + '</td><td>' + dvTable + '</td><td><div class="pull-right"><button type="button" class="btn btn-default btn-xs" id="' + deleteCEID + '"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button></div></td></tr><script type="text/javascript">$("#' + deleteCEID + '").click(function(){deleteCE(' + collectionEvent["ID"] + ');});<\/script>');
-		});
- 		$('#toolCollectionEventsTable > tbody:last').append('<tr><td></td><td></td><td><div class="pull-right"><button type="button" class="btn btn-default btn-xs" id="newCollectionEvent"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button></div></td></tr><script type="text/javascript">$("#newCollectionEvent").click(function(){newCE();});<\/script>');
-	});
+        $.each(collectionEvents, function(i, collectionEvent) {
+            dvTable = "<table class='table table-condensed'>";
+            $.each(collectionEvent["DVIDs"], function(i, dataValue) {
+                deleteDVID = 'deleteDataValue' + dataValue["ID"] + 'ForCE' + collectionEvent["ID"];
+                dvTable += "<tr><td>" + dataValue["ID"] + ':' + dataValue["name"] + '<div class="pull-right"><button type="button" class="btn btn-default btn-xs" id="' + deleteDVID + '"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button></div></td></tr><script type="text/javascript">$("#' + deleteDVID + '").click(function(){deleteDV(' + collectionEvent["ID"] + ', ' + dataValue["ID"] + ');});<\/script>'
+            });
+            dvTable += '<tr><td><div class="pull-right"><button type="button" class="btn btn-default btn-xs" id="newDataValue' + collectionEvent["ID"] +'"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button></div></td></tr><script type="text/javascript">$("#newDataValue' + collectionEvent["ID"] +'").click(function(){newDV(' + collectionEvent["ID"] + ');});<\/script>'
+            dvTable += "</table>";
+            deleteCEID = 'deleteCollectionEvent' + collectionEvent["ID"];
+            $('#toolCollectionEventsTable > tbody:last').append('<tr><td>' + collectionEvent["ID"] + ':' + collectionEvent["name"] + '</td><td>' + dvTable + '</td><td><div class="pull-right"><button type="button" class="btn btn-default btn-xs" id="' + deleteCEID + '"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button></div></td></tr><script type="text/javascript">$("#' + deleteCEID + '").click(function(){deleteCE(' + collectionEvent["ID"] + ');});<\/script>');
+        });
+        $('#toolCollectionEventsTable > tbody:last').append('<tr><td></td><td></td><td><div class="pull-right"><button type="button" class="btn btn-default btn-xs" id="newCollectionEvent"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button></div></td></tr><script type="text/javascript">$("#newCollectionEvent").click(function(){newCE();});<\/script>');
+    });
 }
 
 function deleteDV(ceid, dvid) {
-	$.get('/tools/{{ tool.name }}/settings/collectionevents/' + ceid + '/dataValue/' + dvid + '/delete', function(events){
-		updateCollectionEventsTable();
-	});
+    $.get('/tools/{{ tool.name }}/settings/collectionevents/' + ceid + '/dataValue/' + dvid + '/delete', function(events){
+        updateCollectionEventsTable();
+    });
 }
 
 function deleteCE(ceid) {
-	$.get('/tools/{{ tool.name }}/settings/collectionevents/' + ceid + '/delete', function(events){
-		updateCollectionEventsTable();
-	});
+    $.get('/tools/{{ tool.name }}/settings/collectionevents/' + ceid + '/delete', function(events){
+        updateCollectionEventsTable();
+    });
 }
 
 function newCE() {
-	$("#toolInputNewCollectionEvent").val("");
+    $("#toolInputNewCollectionEvent").val("");
 
-	$("#toolInputNewCollectionEvent").focus();
-	$('#toolNewCollectionEvent').modal();
+    $("#toolInputNewCollectionEvent").focus();
+    $('#toolNewCollectionEvent').modal();
 }
 
 function newDV(ceid) {
-	$("#toolInputNewDataValue").val("");
-	$("#toolInputCollectionEvent").val(ceid)
+    $("#toolInputNewDataValue").val("");
+    $("#toolInputCollectionEvent").val(ceid)
 
-	$("#toolInputNewDataValue").focus();
-	$('#toolNewDataValue').modal();
+    $("#toolInputNewDataValue").focus();
+    $('#toolNewDataValue').modal();
 }
 
 $(document).ready(function(){
-	//terminal functions
-	$("#formTerminal" ).submit(function( event ) {
-		event.preventDefault();
-		val = $("#terminalText").val();
-		$.post("{{ url_for("tool_terminal", toolname=tool.name, TID=0) }}", 'text=' + val , function( data ) {
-			$('#terminal').append("&lt;0:" + val + "<br />");
-			$("#terminalText").val("");
-		});
-	});
+    //terminal functions
+    $("#formTerminal" ).submit(function( event ) {
+        event.preventDefault();
+        val = $("#terminalText").val();
+        $.post("{{ url_for("tool_terminal", toolname=tool.name, TID=0) }}", 'text=' + val , function( data ) {
+            $('#terminal').append("&lt;0:" + val + "<br />");
+            $("#terminalText").val("");
+        });
+    });
 
-	//settings functions
-	$("#buttonToolSettings").click(function(){
-		$.getJSON('{{ url_for("tool_settings", toolname=tool.name) }}', function(settings){
-  			$("#toolInputEnabled").prop('checked', settings.enabled);
-			$("#toolInputType").val(settings.type);
-			$("#toolInputAddress").val(settings.address);
-			$("#toolInputPort").val(settings.port);
-			$("#toolInputDeviceID").val(settings.deviceID);
-			$("#toolInputPassive").prop('checked', settings.passive);
+    //settings functions
+    $("#buttonToolSettings").click(function(){
+        $.getJSON('{{ url_for("tool_settings", toolname=tool.name) }}', function(settings){
+            $("#toolInputEnabled").prop('checked', settings.enabled);
+            $("#toolInputType").val(settings.type);
+            $("#toolInputAddress").val(settings.address);
+            $("#toolInputPort").val(settings.port);
+            $("#toolInputDeviceID").val(settings.deviceID);
+            $("#toolInputPassive").prop('checked', settings.passive);
 
-			$('#toolSettings').modal();
-  		});
+            $('#toolSettings').modal();
+        });
     });
 
     $("#buttonToolCollectionEvents").click(function(){
-    	updateCollectionEventsTable();
-		$('#toolCollectionEvents').modal();
+        updateCollectionEventsTable();
+        $('#toolCollectionEvents').modal();
     });
 
-	$(".toolInputSettingsSubmittable").keydown(function(event) {
-		if(event.keyCode == 13)
-		{
-			$("#formSettings").submit();
-		}
-	});
-
-	$("#buttonSettingsSubmit").click(function(){
-    	$('#formSettings').submit();
+    $(".toolInputSettingsSubmittable").keydown(function(event) {
+        if(event.keyCode == 13)
+        {
+            $("#formSettings").submit();
+        }
     });
 
-	$("#formSettings" ).submit(function( event ) {
-		event.preventDefault();
-
-		toolEnabled = $("#toolInputEnabled").is(":checked");
-		toolType = $("#toolInputType").val();
-		toolAddress = $("#toolInputAddress").val();
-		toolPort = $("#toolInputPort").val();
-		toolDeviceID = $("#toolInputDeviceID").val();
-		toolPassive = $("#toolInputPassive").is(":checked");
-
-		$.post("{{ url_for("tool_settings", toolname=tool.name) }}", { enabled: toolEnabled, type: toolType, address: toolAddress, port: toolPort, deviceID: toolDeviceID, passive: toolPassive  } , function( data ) {
-			if (data == "OK")
-			{
-			}
-		});
-
-		$("#toolSettings").modal('hide');
-	});
-
-	$("#buttonNewCollectionEventSubmit").click(function(){
-    	$('#formNewCollectionEvent').submit();
+    $("#buttonSettingsSubmit").click(function(){
+        $('#formSettings').submit();
     });
 
-	$("#formNewCollectionEvent" ).submit(function( event ) {
-		event.preventDefault();
+    $("#formSettings" ).submit(function( event ) {
+        event.preventDefault();
 
-		newCEID = $("#toolInputNewCollectionEvent").val();
+        toolEnabled = $("#toolInputEnabled").is(":checked");
+        toolType = $("#toolInputType").val();
+        toolAddress = $("#toolInputAddress").val();
+        toolPort = $("#toolInputPort").val();
+        toolDeviceID = $("#toolInputDeviceID").val();
+        toolPassive = $("#toolInputPassive").is(":checked");
 
-		if(!newCEID.match(/^\d+$/)) {
-			return;
-		}
+        $.post("{{ url_for("tool_settings", toolname=tool.name) }}", { enabled: toolEnabled, type: toolType, address: toolAddress, port: toolPort, deviceID: toolDeviceID, passive: toolPassive  } , function( data ) {
+            if (data == "OK")
+            {
+            }
+        });
 
-		$.post("{{ url_for("tool_settings_collectionevent_create", toolname=tool.name) }}", { ceid: newCEID } , function( data ) {
-			if (data == "OK")
-			{
-				$("#toolNewCollectionEvent").modal('hide');
-				
-				updateCollectionEventsTable();
-			}
-		});
+        $("#toolSettings").modal('hide');
     });
 
-	$("#buttonNewDataValueSubmit").click(function(){
-    	$('#formNewDataValue').submit();
+    $("#buttonNewCollectionEventSubmit").click(function(){
+        $('#formNewCollectionEvent').submit();
     });
 
-	$("#formNewDataValue" ).submit(function( event ) {
-		event.preventDefault();
+    $("#formNewCollectionEvent" ).submit(function( event ) {
+        event.preventDefault();
 
-		ceid = $("#toolInputCollectionEvent").val();
-		newDVID = $("#toolInputNewDataValue").val();
+        newCEID = $("#toolInputNewCollectionEvent").val();
 
-		if(!newDVID.match(/^\d+$/)) {
-			return;
-		}
+        if(!newCEID.match(/^\d+$/)) {
+            return;
+        }
 
-		$.post("/tools/{{ tool.name }}/settings/collectionevents/" + ceid + "/dataValue/create", { dvid: newDVID } , function( data ) {
-			if (data == "OK")
-			{
-				$("#toolNewDataValue").modal('hide');
-				
-				updateCollectionEventsTable();
-			}
-		});
+        $.post("{{ url_for("tool_settings_collectionevent_create", toolname=tool.name) }}", { ceid: newCEID } , function( data ) {
+            if (data == "OK")
+            {
+                $("#toolNewCollectionEvent").modal('hide');
+                
+                updateCollectionEventsTable();
+            }
+        });
     });
 
-	//comet functions
-	function doComet() {
-		$.getJSON('/tools/{{ tool.name }}/comet/' + Math.random().toString(36).substr(2, 8), function(events){
-			$.each( events, function( index, event ){
-				console.log(event);
-				switch(event.event)
-				{
-					case "terminal":
-						$('#terminal').append("&gt;" + event.terminal + ":" + event.text + "<br />");
-						break;
-        			case "collectionevent":
-        				valueText = "";
-        				$.each(event.values, function(index, value){
-        					valueText += value.name + "=" + value.value + "<br />"
-        				});
-        				$('#ceidtable tr:first').after('<tr><td><small>'+event.ceid+'</small></td><td><small>'+event.name+'</small></td><td><small>'+valueText+'</small></td></tr>');
-        				break;
-        			case "terminate":
-        				return;
-        				break;
-        		}
-	    	    doComet();
-			});
-    	});
-	}
+    $("#buttonNewDataValueSubmit").click(function(){
+        $('#formNewDataValue').submit();
+    });
 
-	doComet();
+    $("#formNewDataValue" ).submit(function( event ) {
+        event.preventDefault();
+
+        ceid = $("#toolInputCollectionEvent").val();
+        newDVID = $("#toolInputNewDataValue").val();
+
+        if(!newDVID.match(/^\d+$/)) {
+            return;
+        }
+
+        $.post("/tools/{{ tool.name }}/settings/collectionevents/" + ceid + "/dataValue/create", { dvid: newDVID } , function( data ) {
+            if (data == "OK")
+            {
+                $("#toolNewDataValue").modal('hide');
+                
+                updateCollectionEventsTable();
+            }
+        });
+    });
+
+    //comet functions
+    function doComet() {
+        $.getJSON('/tools/{{ tool.name }}/comet/' + Math.random().toString(36).substr(2, 8), function(events){
+            $.each( events, function( index, event ){
+                console.log(event);
+                switch(event.event)
+                {
+                    case "terminal":
+                        $('#terminal').append("&gt;" + event.terminal + ":" + event.text + "<br />");
+                        break;
+                    case "collectionevent":
+                        valueText = "";
+                        $.each(event.values, function(index, value){
+                            valueText += value.name + "=" + value.value + "<br />"
+                        });
+                        $('#ceidtable tr:first').after('<tr><td><small>'+event.ceid+'</small></td><td><small>'+event.name+'</small></td><td><small>'+valueText+'</small></td></tr>');
+                        break;
+                    case "terminate":
+                        return;
+                        break;
+                }
+                doComet();
+            });
+        });
+    }
+
+    doComet();
 });
 </script>
 
-	<h2>Tool {{ tool.name }}<div class="pull-right"><button type="button" class="btn btn-default" title="Collection Events" id="buttonToolCollectionEvents"><span class="glyphicon glyphicon-bullhorn" aria-hidden="true"></span></button>&nbsp;<button type="button" class="btn btn-default" title="Settings" id="buttonToolSettings"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span></button></div></h2>
+    <h2>Tool {{ tool.name }}<div class="pull-right"><button type="button" class="btn btn-default" title="Collection Events" id="buttonToolCollectionEvents"><span class="glyphicon glyphicon-bullhorn" aria-hidden="true"></span></button>&nbsp;<button type="button" class="btn btn-default" title="Settings" id="buttonToolSettings"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span></button></div></h2>
 
-	<h3>CEs
-		<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#ceCollapse" aria-expanded="false" aria-controls="ceCollapse">
-			Toggle
-		</button>
-	</h3> 
-	<div class="collapse" id="ceCollapse">
-		<div class="well">
-			<table class="table table-condensed table-hover" id="ceidtable">
-				<tr><th>CEID</th><th>Name</th><th>Data</th></tr>
-			</table>  	
-		</div>
-	</div>
+    <h3>CEs
+        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#ceCollapse" aria-expanded="false" aria-controls="ceCollapse">
+            Toggle
+        </button>
+    </h3> 
+    <div class="collapse" id="ceCollapse">
+        <div class="well">
+            <table class="table table-condensed table-hover" id="ceidtable">
+                <tr><th>CEID</th><th>Name</th><th>Data</th></tr>
+            </table>    
+        </div>
+    </div>
 
-	<h3>SVIDs
-		<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#svidCollapse" aria-expanded="false" aria-controls="svidCollapse">
-			Toggle
-		</button>
-	</h3> 
-	<div class="collapse" id="svidCollapse">
-		<div class="well">
-			<table class="table table-condensed table-hover">
-				<tr><th>SVID</th><th>Name</th><th>Value</th><th></th></tr>
- 				{% for svid in svids %}
- 					<tr>
- 						<td><small>{{ svid[0].value }}</small></td>
- 						<td><small>{{ svid[1].value }}</small></td>
- 						<td><small><span id="svid{{ svid[0].value }}">{{ svid[2].value }}</span></small></td>
- 						<td><a id="refreshSVID{{ svid[0].value }}" href="{{ url_for('tool_sv', toolname=tool.name, svid=svid[0].value) }}"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></a></span></td>
- 					</tr>
-					<script type="text/javascript">
-						$('#refreshSVID{{ svid[0].value }}').click(function(event){
-							event.preventDefault();
-							$('#svid{{ svid[0].value }}').load(this.href)
-						})
-					</script>
-				{% endfor %}
-			</table>  	
-		</div>
-	</div>
+    <h3>SVIDs
+        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#svidCollapse" aria-expanded="false" aria-controls="svidCollapse">
+            Toggle
+        </button>
+    </h3> 
+    <div class="collapse" id="svidCollapse">
+        <div class="well">
+            <table class="table table-condensed table-hover">
+                <tr><th>SVID</th><th>Name</th><th>Value</th><th></th></tr>
+                {% for svid in svids %}
+                    <tr>
+                        <td><small>{{ svid[0].value }}</small></td>
+                        <td><small>{{ svid[1].value }}</small></td>
+                        <td><small><span id="svid{{ svid[0].value }}">{{ svid[2].value }}</span></small></td>
+                        <td><a id="refreshSVID{{ svid[0].value }}" href="{{ url_for('tool_sv', toolname=tool.name, svid=svid[0].value) }}"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></a></span></td>
+                    </tr>
+                    <script type="text/javascript">
+                        $('#refreshSVID{{ svid[0].value }}').click(function(event){
+                            event.preventDefault();
+                            $('#svid{{ svid[0].value }}').load(this.href)
+                        })
+                    </script>
+                {% endfor %}
+            </table>    
+        </div>
+    </div>
 
-	<h3>ECIDs
-		<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#ecidCollapse" aria-expanded="false" aria-controls="ecidCollapse">
-			Toggle
-		</button>
-	</h3>
-	<div class="collapse" id="ecidCollapse">
-		<div class="well">
-			<table class="table table-condensed table-hover">
-				<tr><th>ECID</th><th>Name</th><th>Min</th><th>Max</th><th>Def</th><th>Units</th><th>Value</th><th></th></tr>
-				{% for ecid in ecids %}
-					<tr>
-						<td><small>{{ ecid[0].value }}</small></td>
-						<td><small>{{ ecid[1].value }}</small></td>
-						<td><small>{{ ecid[2].value }}</small></td>
-						<td><small>{{ ecid[3].value }}</small></td>
-						<td><small>{{ ecid[4].value }}</small></td>
-						<td><small>{{ ecid[5].value }}</small></td>
-						<td><small><span id="valueECID{{ ecid[0].value }}"></span></small></td>
-						<td>
-							<a id="editECID{{ ecid[0].value }}" href="{{ url_for('tool_ec', toolname=tool.name, ecid=ecid[0].value) }}"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></a></span>
-							<a id="refreshECID{{ ecid[0].value }}" href="{{ url_for('tool_ec', toolname=tool.name, ecid=ecid[0].value) }}"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></a></span>
-						</td>
-					</tr>
-					<script type="text/javascript">
-						$('#refreshECID{{ ecid[0].value }}').click(function(event){
-							event.preventDefault();
-							$('#valueECID{{ ecid[0].value }}').load(this.href);
-						})
+    <h3>ECIDs
+        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#ecidCollapse" aria-expanded="false" aria-controls="ecidCollapse">
+            Toggle
+        </button>
+    </h3>
+    <div class="collapse" id="ecidCollapse">
+        <div class="well">
+            <table class="table table-condensed table-hover">
+                <tr><th>ECID</th><th>Name</th><th>Min</th><th>Max</th><th>Def</th><th>Units</th><th>Value</th><th></th></tr>
+                {% for ecid in ecids %}
+                    <tr>
+                        <td><small>{{ ecid[0].value }}</small></td>
+                        <td><small>{{ ecid[1].value }}</small></td>
+                        <td><small>{{ ecid[2].value }}</small></td>
+                        <td><small>{{ ecid[3].value }}</small></td>
+                        <td><small>{{ ecid[4].value }}</small></td>
+                        <td><small>{{ ecid[5].value }}</small></td>
+                        <td><small><span id="valueECID{{ ecid[0].value }}"></span></small></td>
+                        <td>
+                            <a id="editECID{{ ecid[0].value }}" href="{{ url_for('tool_ec', toolname=tool.name, ecid=ecid[0].value) }}"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></a></span>
+                            <a id="refreshECID{{ ecid[0].value }}" href="{{ url_for('tool_ec', toolname=tool.name, ecid=ecid[0].value) }}"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></a></span>
+                        </td>
+                    </tr>
+                    <script type="text/javascript">
+                        $('#refreshECID{{ ecid[0].value }}').click(function(event){
+                            event.preventDefault();
+                            $('#valueECID{{ ecid[0].value }}').load(this.href);
+                        })
 
-						$('#editECID{{ ecid[0].value }}').click(function(event){
-							event.preventDefault();
-							$('#valueECID{{ ecid[0].value }}').html('<form id="formECID{{ ecid[0].value }}" action="{{ url_for("tool_ec", toolname=tool.name, ecid=ecid[0].value) }}"><input id="inputECID{{ ecid[0].value }}" type="text"></form>');
-							$("#inputECID{{ ecid[0].value }}").focus();
+                        $('#editECID{{ ecid[0].value }}').click(function(event){
+                            event.preventDefault();
+                            $('#valueECID{{ ecid[0].value }}').html('<form id="formECID{{ ecid[0].value }}" action="{{ url_for("tool_ec", toolname=tool.name, ecid=ecid[0].value) }}"><input id="inputECID{{ ecid[0].value }}" type="text"></form>');
+                            $("#inputECID{{ ecid[0].value }}").focus();
 
-							href=this.href;
+                            href=this.href;
 
-							$("#formECID{{ ecid[0].value }}" ).submit(function( event ) {
-								val = $("#inputECID{{ ecid[0].value }}").val();
-								$.post(href, 'value=' + val , function( data ) {
-									$('#valueECID{{ ecid[0].value }}').load(href);
-								});
-								event.preventDefault();
-							});
-						})
-					</script>
-				{% endfor %}
-			</table>  	
-		</div>
-	</div>
+                            $("#formECID{{ ecid[0].value }}" ).submit(function( event ) {
+                                val = $("#inputECID{{ ecid[0].value }}").val();
+                                $.post(href, 'value=' + val , function( data ) {
+                                    $('#valueECID{{ ecid[0].value }}').load(href);
+                                });
+                                event.preventDefault();
+                            });
+                        })
+                    </script>
+                {% endfor %}
+            </table>    
+        </div>
+    </div>
 
-	<h3>Terminal
-		<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#terminalCollapse" aria-expanded="false" aria-controls="terminalCollapse">
-			Toggle
-		</button>
-	</h3> 
-	<div class="collapse" id="terminalCollapse">
-		<div class="well">
-			<pre id="terminal"></pre>
-			<form id="formTerminal" action="{{ url_for("tool_terminal", toolname=tool.name, TID=0) }}"><input id="terminalText" class="form-control" type="text"></form>
-		</div>
-	</div>
+    <h3>Terminal
+        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#terminalCollapse" aria-expanded="false" aria-controls="terminalCollapse">
+            Toggle
+        </button>
+    </h3> 
+    <div class="collapse" id="terminalCollapse">
+        <div class="well">
+            <pre id="terminal"></pre>
+            <form id="formTerminal" action="{{ url_for("tool_terminal", toolname=tool.name, TID=0) }}"><input id="terminalText" class="form-control" type="text"></form>
+        </div>
+    </div>
 
 <!-- Modal -->
 <div class="modal fade" id="toolSettings" tabindex="-1" role="dialog" aria-labelledby="toolSettingsLabel" aria-hidden="true">
@@ -299,38 +298,38 @@ $(document).ready(function(){
         <h4 class="modal-title" id="toolSettingsLabel">Settings</h4>
       </div>
       <div class="modal-body">
-		<form id="formSettings" action="{{ url_for("tool_settings", toolname=tool.name) }}">
-			<div class="checkbox">
-				<label>
-					<input type="checkbox" id="toolInputEnabled"> Enabled
-				</label>
-			</div>
-			<div class="form-group">
-				<label for="toolInputType">Type</label>
-				<select id="toolInputType" class="form-control">
-				{% for module in modules %}
-					<option value="{{ module[0] }}">{{ module[0] }}</option>
-				{% endfor %}
-				</select>
-         	</div>
-			<div class="form-group">
-				<label for="toolInputAddress">Address</label>
-				<input type="text" class="form-control toolInputSettingsSubmittable" id="toolInputAddress" placeholder="192.168.1.1">
-				</div>
-			<div class="form-group">
-				<label for="toolInputPort">Port</label>
-				<input type="number" class="form-control toolInputSettingsSubmittable" id="toolInputPort" placeholder="5000">
-				</div>
-			<div class="form-group">
-				<label for="toolInputDeviceID">Device ID</label>
-				<input type="number" class="form-control toolInputSettingsSubmittable" id="toolInputDeviceID" placeholder="0">
-				</div>
-			<div class="checkbox">
-				<label>
-					<input type="checkbox" id="toolInputPassive"> Passive
-				</label>
-			</div>
-		</form>
+        <form id="formSettings" action="{{ url_for("tool_settings", toolname=tool.name) }}">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" id="toolInputEnabled"> Enabled
+                </label>
+            </div>
+            <div class="form-group">
+                <label for="toolInputType">Type</label>
+                <select id="toolInputType" class="form-control">
+                {% for module in modules %}
+                    <option value="{{ module[0] }}">{{ module[0] }}</option>
+                {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="toolInputAddress">Address</label>
+                <input type="text" class="form-control toolInputSettingsSubmittable" id="toolInputAddress" placeholder="192.168.1.1">
+                </div>
+            <div class="form-group">
+                <label for="toolInputPort">Port</label>
+                <input type="number" class="form-control toolInputSettingsSubmittable" id="toolInputPort" placeholder="5000">
+                </div>
+            <div class="form-group">
+                <label for="toolInputDeviceID">Device ID</label>
+                <input type="number" class="form-control toolInputSettingsSubmittable" id="toolInputDeviceID" placeholder="0">
+                </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" id="toolInputPassive"> Passive
+                </label>
+            </div>
+        </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -349,14 +348,14 @@ $(document).ready(function(){
         <h4 class="modal-title" id="toolCollectionEventsLabel">Collection Events</h4>
       </div>
       <div class="modal-body">
-      	<table id="toolCollectionEventsTable" class="table table-condensed">
-      	  <thead>
-      	    <tr><th>CE</th><th>DVs</th><th class="col-sm-1"></th></tr>
-      	  </thead>
-      	  <tbody>
-      	  	<tr><td>dummy</td><td>dummy</td></tr>
-      	  </tbody>
-      	</table>
+        <table id="toolCollectionEventsTable" class="table table-condensed">
+          <thead>
+            <tr><th>CE</th><th>DVs</th><th class="col-sm-1"></th></tr>
+          </thead>
+          <tbody>
+            <tr><td>dummy</td><td>dummy</td></tr>
+          </tbody>
+        </table>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -374,12 +373,12 @@ $(document).ready(function(){
         <h4 class="modal-title" id="toolNewCollectionEventLabel">New Collection Event</h4>
       </div>
       <div class="modal-body">
-		<form id="formNewCollectionEvent">
-			<div class="form-group">
-				<label for="toolInputNewCollectionEvent">CEID</label>
-				<input type="text" class="form-control toolInputNewCollectionEventSubmittable" id="toolInputNewCollectionEvent" placeholder="0">
-			</div>
-		</form>
+        <form id="formNewCollectionEvent">
+            <div class="form-group">
+                <label for="toolInputNewCollectionEvent">CEID</label>
+                <input type="text" class="form-control toolInputNewCollectionEventSubmittable" id="toolInputNewCollectionEvent" placeholder="0">
+            </div>
+        </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -398,13 +397,13 @@ $(document).ready(function(){
         <h4 class="modal-title" id="toolNewDataValueLabel">New Data Value</h4>
       </div>
       <div class="modal-body">
-		<form id="formNewDataValue">
-			<div class="form-group">
-				<label for="toolInputNewDataValue">DVID</label>
-				<input type="text" class="form-control toolInputNewDataValueSubmittable" id="toolInputNewDataValue" placeholder="0">
-			</div>
-			<input type="hidden" id="toolInputCollectionEvent" value="-1">
-		</form>
+        <form id="formNewDataValue">
+            <div class="form-group">
+                <label for="toolInputNewDataValue">DVID</label>
+                <input type="text" class="form-control toolInputNewDataValueSubmittable" id="toolInputNewDataValue" placeholder="0">
+            </div>
+            <input type="hidden" id="toolInputCollectionEvent" value="-1">
+        </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
