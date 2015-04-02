@@ -304,7 +304,20 @@ $(document).ready(function(){
 });
 </script>
 
-    <h2>Tool {{ tool.name }}<div class="pull-right"><button type="button" class="btn btn-default" title="Collection Events" id="buttonToolCollectionEvents"><span class="glyphicon glyphicon-bullhorn" aria-hidden="true"></span></button>&nbsp;<button type="button" class="btn btn-default" title="Settings" id="buttonToolSettings"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span></button></div></h2>
+    <h2>
+        Tool {{ tool.name }}
+        <div class="pull-right">
+            <button type="button" class="btn btn-default" title="Collection Events" id="buttonToolCollectionEvents">
+                <span class="glyphicon glyphicon-bullhorn" aria-hidden="true">
+                </span>
+            </button>
+            &nbsp;
+            <button type="button" class="btn btn-default" title="Settings" id="buttonToolSettings">
+                <span class="glyphicon glyphicon-cog" aria-hidden="true">
+                </span>
+            </button>
+        </div>
+    </h2>
 
     <h3>CEs
         <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#ceCollapse" aria-expanded="false" aria-controls="ceCollapse">
