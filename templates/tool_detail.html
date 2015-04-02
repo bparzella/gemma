@@ -156,6 +156,7 @@ $(document).ready(function(){
         val = $("#terminalText").val();
         $.post("{{ url_for("tool_terminal", toolname=tool.name, TID=0) }}", 'text=' + val , function( data ) {
             $('#terminal').append("&lt;0:" + val + "<br />");
+            $('#terminal').scrollTop($('#terminal')[0].scrollHeight);
             $("#terminalText").val("");
         });
     });
@@ -279,6 +280,15 @@ $(document).ready(function(){
         });
     });
 
+    //terminal modal
+    $("#buttonToolTerminal").click(function(){
+        $('#toolTerminal').modal();
+    });
+
+    $('#toolTerminal').on('shown.bs.modal', function () {
+        $("#terminalText").focus();
+    });
+
     //comet functions
     function doComet() {
         $.getJSON('{{ url_for("tool_comet", toolname=tool.name, queue="##queue##", _external=True) }}'.replace(escape("##queue##"), Math.random().toString(36).substr(2, 8)), function(events){
@@ -288,6 +298,7 @@ $(document).ready(function(){
                 {
                     case "terminal":
                         $('#terminal').append("&gt;" + event.terminal + ":" + event.text + "<br />");
+                        $('#terminal').scrollTop($('#terminal')[0].scrollHeight);
                         break;
                     case "collectionevent":
                         valueText = "";
@@ -312,6 +323,10 @@ $(document).ready(function(){
     <h2>
         Tool {{ tool.name }}
         <div class="pull-right">
+            <button type="button" class="btn btn-default" title="Terminal" id="buttonToolTerminal">
+                <span class="glyphicon glyphicon-align-left" aria-hidden="true">
+                </span>
+            </button>
             <button type="button" class="btn btn-default" title="Collection Events" id="buttonToolCollectionEvents">
                 <span class="glyphicon glyphicon-bullhorn" aria-hidden="true">
                 </span>
@@ -414,18 +429,6 @@ $(document).ready(function(){
                     </script>
                 {% endfor %}
             </table>    
-        </div>
-    </div>
-
-    <h3>Terminal
-        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#terminalCollapse" aria-expanded="false" aria-controls="terminalCollapse">
-            Toggle
-        </button>
-    </h3> 
-    <div class="collapse" id="terminalCollapse">
-        <div class="well">
-            <pre id="terminal"></pre>
-            <form id="formTerminal" action="{{ url_for("tool_terminal", toolname=tool.name, TID=0) }}"><input id="terminalText" class="form-control" type="text"></form>
         </div>
     </div>
 
@@ -548,6 +551,27 @@ $(document).ready(function(){
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         <button type="button" id="buttonNewDataValueSubmit" class="btn btn-primary">Create</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="toolTerminal" tabindex="-1" role="dialog" aria-labelledby="toolTerminalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="toolTerminalLabel">Terminal</h4>
+      </div>
+      <div class="modal-body">
+        <div class="well">
+            <pre id="terminal"></pre>
+            <form id="formTerminal" action="{{ url_for("tool_terminal", toolname=tool.name, TID=0) }}"><input id="terminalText" class="form-control" type="text"></form>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
