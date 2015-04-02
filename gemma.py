@@ -115,7 +115,7 @@ if __name__ == "__main__":
 
     def getToolType(tool):
         #set default handler
-        toolType = gemDefaultHandler
+        toolType = secsDefaultHandler
 
         #check if module loaded for tooltype
         if tool.type in globals():
