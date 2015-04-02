@@ -251,6 +251,17 @@ if __name__ == "__main__":
         else:
             return "NOGET"
 
+    @app.route("/tools/<toolname>/restart")
+    def tool_restart(toolname):
+        tool = Tool.query.filter(Tool.name == toolname).first()
+
+        if connectionManager.hasConnectionTo(tool.name):
+            connectionManager.removePeer(tool.name, tool.address, tool.port, tool.device_id)
+
+        addTool(tool)
+
+        return "OK"
+
     @app.route("/tools/<toolname>/settings/collectionevents/")
     def tool_settings_collectionevents(toolname):
         collectionEvents = []

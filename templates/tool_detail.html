@@ -174,6 +174,11 @@ $(document).ready(function(){
         });
     });
 
+    $("#buttonToolRestart").click(function(){
+        $.get('{{ url_for("tool_restart", toolname=tool.name) }}', function(data){
+        });
+    });
+
     $("#buttonToolCollectionEvents").click(function(){
         updateCollectionEventsTable();
         $('#toolCollectionEvents').modal();
@@ -311,9 +316,12 @@ $(document).ready(function(){
                 <span class="glyphicon glyphicon-bullhorn" aria-hidden="true">
                 </span>
             </button>
-            &nbsp;
             <button type="button" class="btn btn-default" title="Settings" id="buttonToolSettings">
                 <span class="glyphicon glyphicon-cog" aria-hidden="true">
+                </span>
+            </button>
+            <button type="button" class="btn btn-default" title="Restart" id="buttonToolRestart">
+                <span class="glyphicon glyphicon-repeat" aria-hidden="true">
                 </span>
             </button>
         </div>
