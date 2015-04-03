@@ -289,6 +289,75 @@ $(document).ready(function(){
         $("#terminalText").focus();
     });
 
+    //remote command modal
+    $("#buttonToolRemoteCommand").click(function(){
+        $("#toolRemoteCommandParams").empty();
+        $('#toolRemoteCommandSelect').empty();
+        
+        $('#buttonRemoteCommandSubmit').prop('disabled', true);
+
+        $("#toolRemoteCommandSelect").append('<option value="initialSelection">---Select---</option>');
+
+        $.getJSON('{{ url_for("tool_remotecommands", toolname=tool.name) }}', function(rcmds){
+            $.each( rcmds, function( index, rcmd ){
+                $("#toolRemoteCommandSelect").append('<option value="' + rcmd + '">' + rcmd + '</option>');
+            });
+
+            $('#toolRemoteCommand').modal();
+        });
+    });
+
+    $( "#toolRemoteCommandSelect" ).change(function() {
+        selection = $("#toolRemoteCommandSelect").val();
+
+        if (selection != "initialSelection") {
+            $("#toolRemoteCommandSelect option[value='initialSelection']").remove();
+            $('#buttonRemoteCommandSubmit').prop('disabled', false);
+        }
+
+        $.getJSON('{{ url_for("tool_remotecommand_details", toolname=tool.name, rcmd="##rcmd##") }}'.replace(escape("##rcmd##"), selection), function(data){
+            $("#toolRemoteCommandParams").empty();
+            $.each( data.params, function( index, param ){
+                $("#toolRemoteCommandParams").append(' \
+                    <div class="form-group"> \
+                        <label for="' + param.name + '">' + param.name + '</label> \
+                        <input type="text" class="form-control toolInputSettingsSubmittable" id="' + param.name + '"> \
+                    </div> \
+                ');
+            });
+        });
+    });
+
+    $("#buttonRemoteCommandSubmit").click(function(){
+        $('#formRemoteCommand').submit();
+    });
+
+    $("#formRemoteCommand").submit(function( event ) {
+        event.preventDefault();
+
+        rcmd = $("#toolRemoteCommandSelect").val();
+        params = $( "#toolRemoteCommandParams :text" ).map(function() {
+            return this.id + "=" + this.value;
+        }).get().join("&");
+
+        $.get('{{ url_for("tool_remotecommand_run", toolname=tool.name, rcmd="##rcmd##") }}'.replace(escape("##rcmd##"), rcmd), params , function( data ) {
+            if (data == "OK")
+            {
+                $("#toolRemoteCommand").modal('hide');
+            }
+            else
+            {
+                $("#toolRemoteCommand .modal-body").append(' \
+                    <div class="alert alert-danger alert-dismissible" role="alert"> \
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"> \
+                            <span aria-hidden="true">&times;</span> \
+                        </button> \
+                        Error:' + data + ' \
+                    </div>');
+            }
+        });
+    });
+
     //comet functions
     function doComet() {
         $.getJSON('{{ url_for("tool_comet", toolname=tool.name, queue="##queue##", _external=True) }}'.replace(escape("##queue##"), Math.random().toString(36).substr(2, 8)), function(events){
@@ -323,6 +392,10 @@ $(document).ready(function(){
     <h2>
         Tool {{ tool.name }}
         <div class="pull-right">
+            <button type="button" class="btn btn-default" title="Remote Command" id="buttonToolRemoteCommand">
+                <span class="glyphicon glyphicon glyphicon-log-in" aria-hidden="true">
+                </span>
+            </button>
             <button type="button" class="btn btn-default" title="Terminal" id="buttonToolTerminal">
                 <span class="glyphicon glyphicon-align-left" aria-hidden="true">
                 </span>
@@ -458,15 +531,15 @@ $(document).ready(function(){
             <div class="form-group">
                 <label for="toolInputAddress">Address</label>
                 <input type="text" class="form-control toolInputSettingsSubmittable" id="toolInputAddress" placeholder="192.168.1.1">
-                </div>
+            </div>
             <div class="form-group">
                 <label for="toolInputPort">Port</label>
                 <input type="number" class="form-control toolInputSettingsSubmittable" id="toolInputPort" placeholder="5000">
-                </div>
+            </div>
             <div class="form-group">
                 <label for="toolInputDeviceID">Device ID</label>
                 <input type="number" class="form-control toolInputSettingsSubmittable" id="toolInputDeviceID" placeholder="0">
-                </div>
+            </div>
             <div class="checkbox">
                 <label>
                     <input type="checkbox" id="toolInputPassive"> Passive
@@ -572,6 +645,32 @@ $(document).ready(function(){
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="toolRemoteCommand" tabindex="-1" role="dialog" aria-labelledby="toolRemoteCommandLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="toolRemoteCommandLabel">Remote Command</h4>
+      </div>
+      <div class="modal-body">
+        <form id="formRemoteCommand">
+          <div class="form-group">
+            <select id="toolRemoteCommandSelect" class="form-control">
+            </select>
+          </div>
+          <div id="toolRemoteCommandParams">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" id="buttonRemoteCommandSubmit" class="btn btn-primary">Send</button>
       </div>
     </div>
   </div>

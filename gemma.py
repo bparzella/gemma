@@ -262,6 +262,52 @@ if __name__ == "__main__":
 
         return "OK"
 
+    @app.route("/tools/<toolname>/remotecommands")
+    def tool_remotecommands(toolname):
+        tool = Tool.query.filter(Tool.name == toolname).first()
+        toolType = getToolType(tool)
+
+        return json.dumps(toolType.rcmds.keys())
+
+    @app.route("/tools/<toolname>/remotecommand/<rcmd>")
+    def tool_remotecommand_details(toolname, rcmd):
+        tool = Tool.query.filter(Tool.name == toolname).first()
+        toolType = getToolType(tool)
+
+        return json.dumps(toolType.rcmds[rcmd])
+
+    @app.route("/tools/<toolname>/remotecommand/<rcmd>/run")
+    def tool_remotecommand_run(toolname, rcmd):
+        peer = connectionManager[toolname]
+        tool = Tool.query.filter(Tool.name == toolname).first()
+        toolType = getToolType(tool)
+
+        params = []
+
+        for param in request.args:
+            params.append((param, request.args[param]))
+
+        result = secsDecode(peer.sendRemoteCommand(rcmd, params))
+
+        HCACK = ord(result.HCACK.value[0])
+
+        if HCACK == 0:
+            return "OK"
+        elif HCACK == 1:
+            return "Invalid command (%d)" % (HCACK)
+        elif HCACK == 2:
+            return "Cannot do now (%d)" % (HCACK)
+        elif HCACK == 3:
+            return "Parameter error (%d)" % (HCACK)
+        elif HCACK == 4:
+            return "OK"
+        elif HCACK == 5:
+            return "Rejected, already in desired condition (%d)" % (HCACK)
+        elif HCACK == 6:
+            return "Invalid object (%d)" % (HCACK)
+        else:
+            return "Errorcode %d" % (HCACK)
+
     @app.route("/tools/<toolname>/settings/collectionevents/")
     def tool_settings_collectionevents(toolname):
         collectionEvents = []
