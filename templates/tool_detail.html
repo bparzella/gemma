@@ -359,8 +359,8 @@ $(document).ready(function(){
     });
 
     //comet functions
-    function doComet() {
-        $.getJSON('{{ url_for("tool_comet", toolname=tool.name, queue="##queue##", _external=True) }}'.replace(escape("##queue##"), Math.random().toString(36).substr(2, 8)), function(events){
+    function doComet(queue) {
+        $.getJSON('{{ url_for("tool_comet", toolname=tool.name, queue="##queue##", _external=True) }}'.replace(escape("##queue##"), queue), function(events){
             $.each( events, function( index, event ){
                 console.log(event);
                 switch(event.event)
@@ -380,12 +380,12 @@ $(document).ready(function(){
                         return;
                         break;
                 }
-                doComet();
+                doComet(queue);
             });
         });
     }
 
-    doComet();
+    doComet(Math.random().toString(36).substr(2, 8));
 });
 </script>
 
