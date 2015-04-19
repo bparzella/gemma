@@ -17,5 +17,5 @@
 from secsgem import *
 
 class SampleTool(gemDefaultHandler):
-	def __init__(self, address, port, active, sessionID, name):
-		gemDefaultHandler.__init__(self, address, port, active, sessionID, name)
+	def __init__(self, address, port, active, sessionID, name, eventHandler=None):
+		gemDefaultHandler.__init__(self, address, port, active, sessionID, name, eventHandler)

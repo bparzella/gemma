@@ -365,23 +365,20 @@ $(document).ready(function(){
                 console.log(event);
                 switch(event.event)
                 {
-                    case "terminal":
+                    case "TerminalReceived":
                         $('#terminal').append("&gt;" + event.terminal + ":" + event.text + "<br />");
                         $('#terminal').scrollTop($('#terminal')[0].scrollHeight);
                         break;
-                    case "collectionevent":
+                    case "CollectionEventReceived":
                         valueText = "";
                         $.each(event.values, function(index, value){
                             valueText += value.name + "=" + value.value + "<br />"
                         });
                         $('#ceidtable tr:first').after('<tr><td><small>'+event.ceid+'</small></td><td><small>'+event.name+'</small></td><td><small>'+valueText+'</small></td></tr>');
                         break;
-                    case "terminate":
-                        return;
-                        break;
                 }
-                doComet(queue);
             });
+            doComet(queue);
         });
     }
 

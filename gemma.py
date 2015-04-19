@@ -54,6 +54,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///gemma.db'
 
 admin = Admin(app)
 
+events = {}
+eventsLock = threading.Lock()
+eventNotify = {}
+
 class ToolView(ModelView):
     form_overrides = dict(type=SelectField)
     form_columns = ['name', 'type', 'passive', 'address', 'port', 'device_id', 'enabled', 'collection_events']
@@ -98,7 +102,9 @@ class DataValue(db.Model):
     def __repr__(self):
         return str(self.dvid)
 
-def ceSetup(peer):
+def ceSetup(event, data):
+    peer = data['peer']
+
     peer.clearCollectionEvents()
 
     for collectionEvent in peer.registeredCollectionEvents:
@@ -109,9 +115,53 @@ def ceSetup(peer):
         else:
             print "configured ceid %d not found" % (collectionEvent)
 
+def _onEvent(eventName, params):
+    eventsLock.acquire()
+
+    params["event"] = eventName
+    for queue in events:
+        events[queue].append(params)
+
+        eventNotify[queue].set()
+
+    eventsLock.release()
+
+    print "_onEvent:", eventName, "params:", params
+
+def waitForEvents(queue):
+    """Wait for events in the event list and return
+
+    :returns: currently available events
+    :rtype: list
+    """
+    eventsLock.acquire()
+
+    if not queue in events:
+        events[queue] = []
+        eventNotify[queue] = threading.Event()
+
+    if not events[queue]:
+        eventsLock.release()
+
+        while not eventNotify[queue].wait(1):
+            pass
+
+        eventsLock.acquire()
+        eventNotify[queue].clear()
+
+    result = list(events[queue])
+    events[queue] = []
+
+    eventsLock.release()
+
+    return result
+
 if __name__ == "__main__":
+    #setup event handler
+    eventHandler = EventHandler(events={'PeerInitialized': ceSetup}, genericHandler=_onEvent)
+
     #setup connection manager
-    connectionManager = hsmsConnectionManager(postInitCallback = ceSetup)
+    connectionManager = hsmsConnectionManager(eventHandler=eventHandler)
 
     def getToolType(tool):
         #set default handler
@@ -432,15 +482,25 @@ if __name__ == "__main__":
 
         return "NOTFOUND"
 
+    def jsonEncoder(o):
+        if isinstance(o, set):
+            return list(o)
+
+        if hasattr(o, "_serializeData") and callable(getattr(o, "_serializeData")):
+            return getattr(o, "_serializeData")()
+        else:
+            return o.__dict__
+
     @app.route("/tools/<toolname>/comet/<queue>")
     def tool_comet(toolname, queue):
         peer = connectionManager[toolname]
 
         if peer == None:
-            abort(404)
+            time.sleep(2)
+            return json.dumps([])
 
-        events = peer.waitForEvents(queue)
-        return json.dumps(events)
+        events = waitForEvents(queue)
+        return json.dumps(events, default=jsonEncoder, encoding='latin1')
 
     @app.route("/tools/<toolname>/terminal/<TID>", methods=['POST', 'GET'])
     def tool_terminal(toolname, TID):
