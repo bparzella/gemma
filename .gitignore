@@ -64,3 +64,6 @@ docu
 
 # Database
 gemma.db
+
+# Data
+data/processprogram/*/*
