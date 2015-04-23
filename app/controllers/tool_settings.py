@@ -32,6 +32,7 @@ def tool_settings(toolname):
         settings["port"] = tool.port
         settings["deviceID"] = tool.device_id
         settings["passive"] = tool.passive
+        settings["processProgramScope"] = tool.process_program_scope
 
         return json.dumps(settings)
     elif request.method == 'POST':
@@ -45,6 +46,7 @@ def tool_settings(toolname):
         formPort = request.form["port"]
         formDeviceID = request.form["deviceID"]
         formPassive = (request.form["passive"] == "true")
+        formProcessProgramScope = request.form["processProgramScope"]
 
         if not formEnabled == tool.enabled:
             logging.info("tool_settings_update("+toolname+"): Enabled changed, reconnect required")
@@ -75,6 +77,7 @@ def tool_settings(toolname):
         tool.port = formPort
         tool.device_id = formDeviceID
         tool.passive = formPassive
+        tool.process_program_scope = formProcessProgramScope
 
         tool.store()
 

@@ -170,6 +170,7 @@ $(document).ready(function(){
             $("#toolInputPort").val(settings.port);
             $("#toolInputDeviceID").val(settings.deviceID);
             $("#toolInputPassive").prop('checked', settings.passive);
+            $("#toolInputPPScope").val(settings.processProgramScope);
 
             $('#toolSettings').modal();
         });
@@ -205,8 +206,9 @@ $(document).ready(function(){
         toolPort = $("#toolInputPort").val();
         toolDeviceID = $("#toolInputDeviceID").val();
         toolPassive = $("#toolInputPassive").is(":checked");
+        toolPPScope = $("#toolInputPPScope").val();
 
-        $.post("{{ url_for("tool_settings", toolname=tool.name) }}", { enabled: toolEnabled, type: toolType, address: toolAddress, port: toolPort, deviceID: toolDeviceID, passive: toolPassive  } , function( data ) {
+        $.post("{{ url_for("tool_settings", toolname=tool.name) }}", { enabled: toolEnabled, type: toolType, address: toolAddress, port: toolPort, deviceID: toolDeviceID, passive: toolPassive, processProgramScope: toolPPScope  } , function( data ) {
             if (data == "OK")
             {
             }
@@ -536,6 +538,10 @@ $(document).ready(function(){
             <div class="form-group">
                 <label for="toolInputDeviceID">Device ID</label>
                 <input type="number" class="form-control toolInputSettingsSubmittable" id="toolInputDeviceID" placeholder="0">
+            </div>
+            <div class="form-group">
+                <label for="toolInputPPScope">Process Program Scope</label>
+                <input type="text" class="form-control toolInputSettingsSubmittable" id="toolInputPPScope">
             </div>
             <div class="checkbox">
                 <label>

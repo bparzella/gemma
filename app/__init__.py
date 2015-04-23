@@ -29,6 +29,9 @@ db = SQLAlchemy(app)
 db.create_all()
 
 import helpers
+
+toolHandlers = helpers.loadModules("plugins/toolhandlers")
+
 import models
 import controllers
 #from models import *

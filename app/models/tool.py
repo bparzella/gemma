@@ -25,6 +25,7 @@ class Tool(db.Model):
     port = db.Column(db.Integer)
     device_id = db.Column(db.Integer)
     enabled = db.Column(db.Boolean)
+    process_program_scope = db.Column(db.String(80))
     collection_events = db.relationship('CollectionEvent', backref='tool', lazy='dynamic', cascade="all, delete, delete-orphan")
 #    log_entries = db.relationship('LogEntry', backref='tool', lazy='dynamic', cascade="all, delete, delete-orphan")
 

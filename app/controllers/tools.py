@@ -16,7 +16,7 @@
 
 import time
 
-from app import app, models, helpers
+from app import app, models, helpers, toolHandlers
 from flask import render_template, redirect, url_for, request, json, abort
 
 @app.route("/tools/")
@@ -35,7 +35,7 @@ def tool_detail(toolname):
         SVs = {}
         ECs = {}
 
-    return render_template("tool_detail.html", peer = peer, tool = tool, modules = helpers.toolHandlers, svids = SVs, ecids = ECs)
+    return render_template("tool_detail.html", peer = peer, tool = tool, modules = toolHandlers, svids = SVs, ecids = ECs)
 
 @app.route("/tools/<toolname>/restart")
 def tool_restart(toolname):

@@ -54,7 +54,7 @@ docs/_build/
 target/
 
 # Toolhandlers
-toolhandlers/Data*.py
+plugins/toolhandlers/Data*.py
 
 # Virtual environment
 venv

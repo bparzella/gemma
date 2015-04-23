@@ -49,5 +49,3 @@ def getToolType(tool):
                 toolType = classType
 
     return toolType
-
-toolHandlers = loadModules("plugins/toolhandlers")
