@@ -43,7 +43,7 @@ class gemmaDefaultHandler(gemDefaultHandler):
         :param packet: complete message received
         :type packet: :class:`secsgem.hsmsPackets.hsmsPacket`
         """
-        message = secsDecode(packet)
+        message = self.secsDecode(packet)
 
         tool = models.Tool.query.filter(models.Tool.name == self.name).first()
 
@@ -63,7 +63,7 @@ class gemmaDefaultHandler(gemDefaultHandler):
         :param packet: complete message received
         :type packet: :class:`secsgem.hsmsPackets.hsmsPacket`
         """
-        message = secsDecode(packet)
+        message = self.secsDecode(packet)
 
         tool = models.Tool.query.filter(models.Tool.name == self.name).first()
 
