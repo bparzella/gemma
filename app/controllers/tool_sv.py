@@ -25,4 +25,4 @@ def tool_sv(toolname, svid):
     if isinstance(result, list):
         return str(result)
 
-    return str(result.value)
+    return str(result)

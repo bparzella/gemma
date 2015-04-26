@@ -29,8 +29,8 @@ def tool_detail(toolname):
     tool = models.Tool.query.filter(models.Tool.name == toolname).first()
 
     if peer and peer.connection:
-        SVs = sorted(peer.listSVs(), key=lambda SV: SV[0].value)
-        ECs = sorted(peer.listECs(), key=lambda EC: EC[0].value)
+        SVs = sorted(peer.listSVs(), key=lambda SV: SV.SVID)
+        ECs = sorted(peer.listECs(), key=lambda EC: EC.ECID)
     else:
         SVs = {}
         ECs = {}

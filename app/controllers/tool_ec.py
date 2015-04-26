@@ -21,12 +21,12 @@ from flask import render_template, redirect, url_for, request, json, abort
 def tool_ec(toolname, ecid):
     peer = helpers.connectionManager[toolname]
     if request.method == 'POST':
-        result = peer.requestEC(int(ecid))
-        result.value = int(request.form["value"])
+        result = peer.requestEC(int(ecid)).format.data[0].value
+        result.set(request.form["value"])
         result = peer.setEC(int(ecid), result)
 
-        return str(ord(result.value[0]))
+        return str(result)
     else:
-        result = peer.requestEC(int(ecid))
+        result = peer.requestEC(int(ecid))[0]
 
-        return str(result.value)
+        return str(result)

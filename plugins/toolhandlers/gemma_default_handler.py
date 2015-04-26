@@ -47,10 +47,10 @@ class gemmaDefaultHandler(gemDefaultHandler):
 
         tool = models.Tool.query.filter(models.Tool.name == self.name).first()
 
-        helpers.storeProcessProgram(tool.process_program_scope, message.PPID.value, message.PPBODY.value)
-        connection.sendResponse(secsS7F4(0), packet.header.system)
+        helpers.storeProcessProgram(tool.process_program_scope, message.PPID, message.PPBODY)
+        connection.sendResponse(self.streamFunction(7, 4)(0), packet.header.system)
 
-        data = {"processProgramScope": tool.process_program_scope, "processProgramID": message.PPID.value, "connection": self.connection, 'peer': self}
+        data = {"processProgramScope": tool.process_program_scope, "processProgramID": message.PPID, "connection": self.connection, 'peer': self}
         self.fireEvent("ProcessProgramStored", data)
 
     def S7F5Handler(self, connection, packet):
@@ -67,11 +67,11 @@ class gemmaDefaultHandler(gemDefaultHandler):
 
         tool = models.Tool.query.filter(models.Tool.name == self.name).first()
 
-        data = helpers.getProcessProgram(tool.process_program_scope, message.PPID.value)
+        data = helpers.getProcessProgram(tool.process_program_scope, message.get())
         
         if data:
-            connection.sendResponse(secsS7F6(message.PPID.value, data), packet.header.system)
+            connection.sendResponse(self.streamFunction(7, 6)({"PPID": message.get(), "PPBODY": data}), packet.header.system)
 
-        data = {"processProgramScope": tool.process_program_scope, "processProgramID": message.PPID.value, "connection": self.connection, 'peer': self}
+        data = {"processProgramScope": tool.process_program_scope, "processProgramID": message.get(), "connection": self.connection, 'peer': self}
         self.fireEvent("ProcessProgramRetrieved", data)
 

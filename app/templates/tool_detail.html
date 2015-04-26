@@ -438,15 +438,15 @@ $(document).ready(function(){
                 <tr><th>SVID</th><th>Name</th><th>Value</th><th></th></tr>
                 {% for svid in svids %}
                     <tr>
-                        <td><small>{{ svid[0].value }}</small></td>
-                        <td><small>{{ svid[1].value }}</small></td>
-                        <td><small><span id="svid{{ svid[0].value }}">{{ svid[2].value }}</span></small></td>
-                        <td><a id="refreshSVID{{ svid[0].value }}" href="{{ url_for('tool_sv', toolname=tool.name, svid=svid[0].value) }}"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></a></span></td>
+                        <td><small>{{ svid.SVID }}</small></td>
+                        <td><small>{{ svid.SVNAME }}</small></td>
+                        <td><small><span id="svid{{ svid.SVID }}">{{ svid.UNITS }}</span></small></td>
+                        <td><a id="refreshSVID{{ svid.SVID }}" href="{{ url_for('tool_sv', toolname=tool.name, svid=svid.SVID) }}"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></a></span></td>
                     </tr>
                     <script type="text/javascript">
-                        $('#refreshSVID{{ svid[0].value }}').click(function(event){
+                        $('#refreshSVID{{ svid.SVID }}').click(function(event){
                             event.preventDefault();
-                            $('#svid{{ svid[0].value }}').load(this.href)
+                            $('#svid{{ svid.SVID }}').load(this.href)
                         })
                     </script>
                 {% endfor %}
@@ -465,35 +465,35 @@ $(document).ready(function(){
                 <tr><th>ECID</th><th>Name</th><th>Min</th><th>Max</th><th>Def</th><th>Units</th><th>Value</th><th></th></tr>
                 {% for ecid in ecids %}
                     <tr>
-                        <td><small>{{ ecid[0].value }}</small></td>
-                        <td><small>{{ ecid[1].value }}</small></td>
-                        <td><small>{{ ecid[2].value }}</small></td>
-                        <td><small>{{ ecid[3].value }}</small></td>
-                        <td><small>{{ ecid[4].value }}</small></td>
-                        <td><small>{{ ecid[5].value }}</small></td>
-                        <td><small><span id="valueECID{{ ecid[0].value }}"></span></small></td>
+                        <td><small>{{ ecid.ECID }}</small></td>
+                        <td><small>{{ ecid.ECNAME }}</small></td>
+                        <td><small>{{ ecid.ECMIN }}</small></td>
+                        <td><small>{{ ecid.ECMAX }}</small></td>
+                        <td><small>{{ ecid.ECDEF }}</small></td>
+                        <td><small>{{ ecid.UNITS }}</small></td>
+                        <td><small><span id="valueECID{{ ecid.ECID }}"></span></small></td>
                         <td>
-                            <a id="editECID{{ ecid[0].value }}" href="{{ url_for('tool_ec', toolname=tool.name, ecid=ecid[0].value) }}"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></a></span>
-                            <a id="refreshECID{{ ecid[0].value }}" href="{{ url_for('tool_ec', toolname=tool.name, ecid=ecid[0].value) }}"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></a></span>
+                            <a id="editECID{{ ecid.ECID }}" href="{{ url_for('tool_ec', toolname=tool.name, ecid=ecid.ECID) }}"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></a></span>
+                            <a id="refreshECID{{ ecid.ECID }}" href="{{ url_for('tool_ec', toolname=tool.name, ecid=ecid.ECID) }}"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></a></span>
                         </td>
                     </tr>
                     <script type="text/javascript">
-                        $('#refreshECID{{ ecid[0].value }}').click(function(event){
+                        $('#refreshECID{{ ecid.ECID }}').click(function(event){
                             event.preventDefault();
-                            $('#valueECID{{ ecid[0].value }}').load(this.href);
+                            $('#valueECID{{ ecid.ECID }}').load(this.href);
                         })
 
-                        $('#editECID{{ ecid[0].value }}').click(function(event){
+                        $('#editECID{{ ecid.ECID }}').click(function(event){
                             event.preventDefault();
-                            $('#valueECID{{ ecid[0].value }}').html('<form id="formECID{{ ecid[0].value }}" action="{{ url_for("tool_ec", toolname=tool.name, ecid=ecid[0].value) }}"><input id="inputECID{{ ecid[0].value }}" type="text"></form>');
-                            $("#inputECID{{ ecid[0].value }}").focus();
+                            $('#valueECID{{ ecid.ECID }}').html('<form id="formECID{{ ecid.ECID }}" action="{{ url_for("tool_ec", toolname=tool.name, ecid=ecid.ECID) }}"><input id="inputECID{{ ecid.ECID }}" type="text"></form>');
+                            $("#inputECID{{ ecid.ECID }}").focus();
 
                             href=this.href;
 
-                            $("#formECID{{ ecid[0].value }}" ).submit(function( event ) {
-                                val = $("#inputECID{{ ecid[0].value }}").val();
+                            $("#formECID{{ ecid.ECID }}" ).submit(function( event ) {
+                                val = $("#inputECID{{ ecid.ECID }}").val();
                                 $.post(href, 'value=' + val , function( data ) {
-                                    $('#valueECID{{ ecid[0].value }}').load(href);
+                                    $('#valueECID{{ ecid.ECID }}').load(href);
                                 });
                                 event.preventDefault();
                             });

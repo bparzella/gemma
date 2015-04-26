@@ -44,7 +44,7 @@ def tool_remotecommand_run(toolname, rcmd):
 
     result = peer.sendRemoteCommand(rcmd, params)
 
-    HCACK = ord(result.HCACK.value[0])
+    HCACK = result.HCACK
 
     if HCACK == 0:
         return "OK"
