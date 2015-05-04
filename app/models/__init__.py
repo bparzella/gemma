@@ -19,4 +19,7 @@ from app import db
 from tool import Tool
 from collection_event import CollectionEvent
 from data_value import DataValue
+
+from G85_map import G85Map
+
 #from log_entry import LogEntry
