@@ -115,7 +115,7 @@ class gemmaDefaultHandler(gemDefaultHandler):
 
         print message
 
-        map = models.G85Map.load("data/map/test.xml", "TESTMAP-01")
+        map = models.G85Map.load("data/map/"+message.MID+".xml", message.MID)
 
         s12f04 = self.streamFunction(12, 4)()
         s12f04.MID = message.MID
@@ -191,7 +191,7 @@ class gemmaDefaultHandler(gemDefaultHandler):
         """
         message = self.secsDecode(packet)
 
-        map = models.G85Map.load("data/map/test.xml", "TESTMAP-01")
+        map = models.G85Map.load("data/map/"+message.MID+".xml", message.MID)
 
         s12f16 = self.streamFunction(12, 16)()
         s12f16.MID = message.MID
