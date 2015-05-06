@@ -1,0 +1,87 @@
+<div class="modal fade" id="toolSettings" tabindex="-1" role="dialog" aria-labelledby="toolSettingsLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="toolSettingsLabel">Settings</h4>
+      </div>
+      <div class="modal-body">
+        <form id="formSettings" action="{{ form.postURL }}">
+            {{ form.csrf_token }}
+            <div class="form-group">
+                {{ form.type.label }} {{ form.type(class="form-control") }}
+                <div class="text-danger" id="error_{{ form.type.name }}"></div>
+            </div>
+            <div class="form-group">
+                {{ form.host.label }} {{ form.host(class="form-control toolInputSettingsSubmittable") }}
+                <div class="text-danger" id="error_{{ form.host.name }}"></div>
+            </div>
+            <div class="form-group">
+                {{ form.port.label }} {{ form.port(class="form-control toolInputSettingsSubmittable") }}
+                <div class="text-danger" id="error_{{ form.port.name }}"></div>
+            </div>
+            <div class="form-group">
+                {{ form.deviceID.label }} {{ form.deviceID(class="form-control toolInputSettingsSubmittable") }}
+                <div class="text-danger" id="error_{{ form.deviceID.name }}"></div>
+            </div>
+            <div class="form-group">
+                {{ form.ppScope.label }} {{ form.ppScope(class="form-control toolInputSettingsSubmittable") }}
+                <div class="text-danger" id="error_{{ form.ppScope.name }}"></div>
+            </div>
+            <div class="checkbox">
+                <label>
+                    {{ form.passive() }} {{ form.passive.label }}
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    {{ form.enabled() }} {{ form.enabled.label }}
+                </label>
+            </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" id="buttonSettingsSubmit" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $(".toolInputSettingsSubmittable").keydown(function(event) {
+            if(event.keyCode == 13)
+            {
+                $("#formSettings").submit();
+            }
+        });
+
+        $("#buttonSettingsSubmit").click(function(){
+            $('#formSettings').submit();
+        });
+
+        $("#formSettings" ).submit(function( event ) {
+            event.preventDefault();
+
+            console.log($('#formSettings').serialize());
+            
+            $.post($(this).attr("action"), $('#formSettings').serialize() , function( data ) {
+                var response = jQuery.parseJSON(data);
+                if (response == "OK")
+                {
+                    $("#toolSettings").modal('hide');
+                }
+                else
+                {
+                    $.each(response, function(key, value) {
+                        $("#error_" + key).html(value.join("<br/>"));
+                    });
+                }
+            });
+
+        });
+
+        $('#toolSettings').modal();
+    });
+</script>

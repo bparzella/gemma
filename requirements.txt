@@ -1,4 +1,4 @@
 secsgem
 flask
 flask-sqlalchemy
-flask-admin
+flask-wtf

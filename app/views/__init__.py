@@ -1,5 +1,5 @@
 #####################################################################
-# app/__init__.py
+# app/views/__init__.py
 #
 # (c) Copyright 2015, Benjamin Parzella. All rights reserved.
 #
@@ -14,33 +14,4 @@
 # GNU Lesser General Public License for more details.
 #####################################################################
 
-from flask import Flask
-from flask.ext.sqlalchemy import SQLAlchemy
-
-import logging
-
-logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
-
-app = Flask(__name__)
-app.config.from_object('config')
-
-db = SQLAlchemy(app)
-
-db.create_all()
-
-import helpers
-
-toolHandlers = helpers.loadModules("plugins/toolhandlers")
-
-import models
-import controllers
-import views
-#from models import *
-#from controllers import *
-
-# instanciate all configured tools
-for tool in models.Tool.query.all():
-    helpers.addTool(tool)
-
-def stop():
-	helpers.stop()
+from settings import DialogSettings

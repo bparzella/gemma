@@ -15,6 +15,7 @@
 #####################################################################
 
 import generic
+import dialog
 import tools
 import tool_settings
 import tool_terminal

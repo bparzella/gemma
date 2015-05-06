@@ -56,9 +56,6 @@ target/
 # Toolhandlers
 plugins/toolhandlers/Data*.py
 
-# Virtual environment
-venv
-
 # Documentation
 docu
 
