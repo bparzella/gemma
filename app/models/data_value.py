@@ -16,6 +16,7 @@
 
 from app import db
 
+
 class DataValue(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     ce_id = db.Column(db.Integer, db.ForeignKey('collection_event.id'), nullable=False)

@@ -14,6 +14,7 @@
 # GNU Lesser General Public License for more details.
 #####################################################################
 
+
 def jsonEncoder(o):
     if isinstance(o, set):
         return list(o)

@@ -35,12 +35,13 @@ toolHandlers = helpers.loadModules("plugins/toolhandlers")
 import models
 import controllers
 import views
-#from models import *
-#from controllers import *
+# from models import *
+# from controllers import *
 
 # instanciate all configured tools
 for tool in models.Tool.query.all():
     helpers.addTool(tool)
 
+
 def stop():
-	helpers.stop()
+    helpers.stop()

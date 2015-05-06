@@ -17,7 +17,8 @@
 import logging
 
 from app import app, models, helpers
-from flask import render_template, redirect, url_for, request, json, abort
+from flask import request, json
+
 
 @app.route("/tools/<toolname>/settings", methods=['GET', 'POST'])
 def tool_settings(toolname):
@@ -88,6 +89,7 @@ def tool_settings(toolname):
     else:
         return "NOGET"
 
+
 @app.route("/tools/<toolname>/settings/collectionevents/")
 def tool_settings_collectionevents(toolname):
     collectionEvents = []
@@ -113,6 +115,7 @@ def tool_settings_collectionevents(toolname):
 
     return json.dumps(collectionEvents)
 
+
 @app.route("/tools/<toolname>/settings/collectionevents/available")
 def tool_settings_collectionevent_available(toolname):
     tool = models.Tool.query.filter(models.Tool.name == toolname).first()
@@ -125,6 +128,7 @@ def tool_settings_collectionevent_available(toolname):
         ceids.append(ce)
 
     return json.dumps(ceids)
+
 
 @app.route("/tools/<toolname>/settings/collectionevents/create", methods=["POST"])
 def tool_settings_collectionevent_create(toolname):
@@ -146,6 +150,7 @@ def tool_settings_collectionevent_create(toolname):
     else:
         return "ILLEGAL_REQUEST " + request.method
 
+
 @app.route("/tools/<toolname>/settings/collectionevents/<ceid>/delete")
 def tool_settings_collectionevent_delete(toolname, ceid):
     tool = models.Tool.query.filter(models.Tool.name == toolname).first()
@@ -156,6 +161,7 @@ def tool_settings_collectionevent_delete(toolname, ceid):
             return "OK"
 
     return "NOTFOUND"
+
 
 @app.route("/tools/<toolname>/settings/collectionevents/<ceid>/dataValue/available")
 def tool_settings_datavalue_available(toolname, ceid):
@@ -171,6 +177,7 @@ def tool_settings_datavalue_available(toolname, ceid):
                 dvids.append(dv)
 
     return json.dumps(dvids)
+
 
 @app.route("/tools/<toolname>/settings/collectionevents/<ceid>/dataValue/create", methods=["POST"])
 def tool_settings_collectionevent_datavalue_create(toolname, ceid):
@@ -195,6 +202,7 @@ def tool_settings_collectionevent_datavalue_create(toolname, ceid):
     else:
         return "ILLEGAL_REQUEST " + request.method
 
+
 @app.route("/tools/<toolname>/settings/collectionevents/<ceid>/dataValue/<dvid>/delete")
 def tool_settings_collectionevent_datavalue_delete(toolname, ceid, dvid):
     tool = models.Tool.query.filter(models.Tool.name == toolname).first()
@@ -207,4 +215,3 @@ def tool_settings_collectionevent_datavalue_delete(toolname, ceid, dvid):
                     return "OK"
 
     return "NOTFOUND"
-

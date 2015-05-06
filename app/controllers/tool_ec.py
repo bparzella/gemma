@@ -14,8 +14,9 @@
 # GNU Lesser General Public License for more details.
 #####################################################################
 
-from app import app, models, helpers
-from flask import render_template, redirect, url_for, request, json, abort
+from app import app, helpers
+from flask import request
+
 
 @app.route("/tools/<toolname>/ec/<ecid>", methods=['POST', 'GET'])
 def tool_ec(toolname, ecid):

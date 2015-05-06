@@ -16,10 +16,12 @@
 
 from app import app
 
+
 @app.context_processor
 def utility_processor():
     def handlebar_tag(tag):
         return '{{' + tag + '}}'
+
     def handlebar_tag_raw(tag):
         return '{{{' + tag + '}}}'
     return dict(handlebar_tag=handlebar_tag, handlebar_tag_raw=handlebar_tag_raw)

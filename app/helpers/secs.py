@@ -24,6 +24,7 @@ events = {}
 eventsLock = threading.Lock()
 eventNotify = {}
 
+
 def ceSetup(event, data):
     peer = data['peer']
 
@@ -36,6 +37,7 @@ def ceSetup(event, data):
             peer.subscribeCollectionEvent(ceid, dvids)
         else:
             print "configured ceid %d not found" % (collectionEvent)
+
 
 def _onEvent(eventName, params):
     eventsLock.acquire()
@@ -50,6 +52,7 @@ def _onEvent(eventName, params):
 
     print "_onEvent:", eventName, "params:", params
 
+
 def waitForEvents(queue):
     """Wait for events in the event list and return
 
@@ -58,7 +61,7 @@ def waitForEvents(queue):
     """
     eventsLock.acquire()
 
-    if not queue in events:
+    if queue not in events:
         events[queue] = []
         eventNotify[queue] = threading.Event()
 
@@ -78,20 +81,21 @@ def waitForEvents(queue):
 
     return result
 
-#setup event handler
+# setup event handler
 eventHandler = secsgem.EventHandler(events={'PeerInitialized': ceSetup}, genericHandler=_onEvent)
 
-#setup connection manager
+# setup connection manager
 connectionManager = secsgem.hsmsConnectionManager(eventHandler=eventHandler)
 
+
 def addTool(tool):
-    #skip disabled tools
+    # skip disabled tools
     if not tool.enabled:
         return
 
     toolType = getToolType(tool)
 
-    #add configured tool to the connectionmanager
+    # add configured tool to the connectionmanager
     peer = connectionManager.addPeer(tool.name, tool.address, tool.port, tool.passive, tool.device_id, toolType)
 
     ceids = []
@@ -104,6 +108,6 @@ def addTool(tool):
 
     peer.registeredCollectionEvents = ceids
 
-def stop():
-	connectionManager.stop()
 
+def stop():
+    connectionManager.stop()

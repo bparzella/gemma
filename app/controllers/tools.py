@@ -17,11 +17,13 @@
 import time
 
 from app import app, models, helpers, toolHandlers
-from flask import render_template, redirect, url_for, request, json, abort
+from flask import render_template, json
+
 
 @app.route("/tools/")
 def tools_list():
-    return render_template("tools_list.html", tools = models.Tool.query.all(), connectionManager = helpers.connectionManager)
+    return render_template("tools_list.html", tools=models.Tool.query.all(), connectionManager = helpers.connectionManager)
+
 
 @app.route("/tools/<toolname>")
 def tool_detail(toolname):
@@ -35,7 +37,8 @@ def tool_detail(toolname):
         SVs = {}
         ECs = {}
 
-    return render_template("tool_detail.html", peer = peer, tool = tool, modules = toolHandlers, svids = SVs, ecids = ECs)
+    return render_template("tool_detail.html", peer=peer, tool=tool, modules=toolHandlers, svids=SVs, ecids=ECs)
+
 
 @app.route("/tools/<toolname>/restart")
 def tool_restart(toolname):
@@ -48,11 +51,12 @@ def tool_restart(toolname):
 
     return "OK"
 
+
 @app.route("/tools/<toolname>/comet/<queue>")
 def tool_comet(toolname, queue):
     peer = helpers.connectionManager[toolname]
 
-    if peer == None:
+    if peer is None:
         time.sleep(2)
         return json.dumps([])
 

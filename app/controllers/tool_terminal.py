@@ -14,14 +14,15 @@
 # GNU Lesser General Public License for more details.
 #####################################################################
 
-from app import app, models, helpers
-from flask import render_template, redirect, url_for, request, json, abort
+from app import app, helpers
+from flask import request, abort
+
 
 @app.route("/tools/<toolname>/terminal/<TID>", methods=['POST', 'GET'])
 def tool_terminal(toolname, TID):
     peer = helpers.connectionManager[toolname]
 
-    if peer == None:
+    if peer is None:
         abort(404)
 
     if request.method == 'POST':

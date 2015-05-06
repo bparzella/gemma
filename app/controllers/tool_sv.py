@@ -14,8 +14,8 @@
 # GNU Lesser General Public License for more details.
 #####################################################################
 
-from app import app, models, helpers
-from flask import render_template, redirect, url_for, request, json, abort
+from app import app, helpers
+
 
 @app.route("/tools/<toolname>/sv/<svid>")
 def tool_sv(toolname, svid):

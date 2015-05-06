@@ -15,7 +15,8 @@
 #####################################################################
 
 from app import app, models, helpers
-from flask import render_template, redirect, url_for, request, json, abort
+from flask import request, json
+
 
 @app.route("/tools/<toolname>/remotecommands")
 def tool_remotecommands(toolname):
@@ -24,6 +25,7 @@ def tool_remotecommands(toolname):
 
     return json.dumps(toolType.rcmds.keys())
 
+
 @app.route("/tools/<toolname>/remotecommand/<rcmd>")
 def tool_remotecommand_details(toolname, rcmd):
     tool = models.Tool.query.filter(models.Tool.name == toolname).first()
@@ -31,11 +33,10 @@ def tool_remotecommand_details(toolname, rcmd):
 
     return json.dumps(toolType.rcmds[rcmd])
 
+
 @app.route("/tools/<toolname>/remotecommand/<rcmd>/run")
 def tool_remotecommand_run(toolname, rcmd):
     peer = helpers.connectionManager[toolname]
-    tool = models.Tool.query.filter(models.Tool.name == toolname).first()
-    toolType = helpers.getToolType(tool)
 
     params = []
 

@@ -19,32 +19,34 @@ import os
 
 import secsgem
 
+
 def loadModules(path):
-    modules=[]
+    modules = []
     sys.path.append(path)
     for name in os.listdir(path):
         if name.endswith(".py"):
-            #strip the extension
+            # strip the extension
             module = name[:-3]
-            modules.append((module,module))
+            modules.append((module, module))
             # set the module name in the current global name space:
             globals()[module] = __import__(module)
 
     return modules
 
+
 def getToolType(tool):
-    #set default handler
+    # set default handler
     toolType = secsgem.secsDefaultHandler
 
-    #check if module loaded for tooltype
+    # check if module loaded for tooltype
     if tool.type in globals():
-        #get loaded module
+        # get loaded module
         module = globals()[tool.type]
-        #check if module has class for tooltype
+        # check if module has class for tooltype
         if tool.type in module.__dict__:
-            #get loaded class
+            # get loaded class
             classType = module.__dict__[tool.type]
-            #check if class is correct type
+            # check if class is correct type
             if issubclass(classType, secsgem.secsDefaultHandler):
                 toolType = classType
 

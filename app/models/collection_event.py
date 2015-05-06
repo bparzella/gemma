@@ -16,6 +16,7 @@
 
 from app import db
 
+
 class CollectionEvent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     tool_id = db.Column(db.Integer, db.ForeignKey('tool.id'), nullable=False)
@@ -28,7 +29,7 @@ class CollectionEvent(db.Model):
     def create(self):
         db.session.add(self)
         db.session.commit()
-        
+
     def delete(self):
         db.session.delete(self)
         db.session.commit()
