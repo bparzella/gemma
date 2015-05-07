@@ -163,7 +163,7 @@ $(document).ready(function(){
 
     //settings functions
     $("#buttonToolSettings").click(function(){
-        $( "#modalContent" ).load( "{{ url_for("renderDialog", dialog="DialogSettings", toolname="fcq_bepa_tcb") }}" );
+        $( "#modalContent" ).load( "{{ url_for("renderDialog", dialog="DialogSettings", toolname=tool.name) }}" );
     });
 
     $("#buttonToolRestart").click(function(){
