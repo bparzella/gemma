@@ -322,6 +322,7 @@ $(document).ready(function(){
     //comet functions
     function doComet(queue) {
         $.getJSON('{{ url_for("tool_comet", toolname=tool.name, queue="##queue##", _external=True) }}'.replace(escape("##queue##"), queue), function(events){
+            $("#disableOverlay").hide();
             $.each( events, function( index, event ){
                 console.log(event);
                 switch(event.event)
@@ -345,6 +346,8 @@ $(document).ready(function(){
 
             var err = textStatus + ", " + error;
             console.log( "Request Failed: " + err );
+
+            setTimeout(function() { doComet(queue); }, 1000);
         });
     }
 
