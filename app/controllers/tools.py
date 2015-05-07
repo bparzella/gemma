@@ -56,6 +56,9 @@ def tool_restart(toolname):
 def tool_comet(toolname, queue):
     peer = helpers.connectionManager[toolname]
 
+    if not helpers.queueExists(queue):
+        return json.dumps({}, default=helpers.jsonEncoder, encoding='latin1')
+
     if peer is None:
         time.sleep(2)
         return json.dumps([])
