@@ -45,3 +45,4 @@ for tool in models.Tool.query.all():
 
 def stop():
     helpers.stop()
+    helpers._onEvent("terminate", {})
