@@ -15,15 +15,15 @@
 #####################################################################
 
 import sys
-import signal
 import traceback
 import threading
+import time
 
 import app as appmodule
 from app import app
 
 
-def strackTrace(num, frame):
+def strackTrace():
     print >> sys.stderr, "\n*** STACKTRACE - START ***\n"
 
     threadNames = {}
@@ -43,8 +43,15 @@ def strackTrace(num, frame):
         print >> sys.stderr, line
     print >> sys.stderr, "\n*** STACKTRACE - END ***\n"
 
-signal.signal(signal.SIGUSR1, strackTrace)
-
 app.run(host="0.0.0.0", port=4999, debug=True, use_reloader=False, threaded=True)
 
 appmodule.stop()
+
+# wait for everything to shut down
+time.sleep(1)
+
+# as long as more than one thread is running
+while threading.activeCount() > 1:
+    # display stack trace every 10 seconds
+    strackTrace()
+    time.sleep(10)
