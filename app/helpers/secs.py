@@ -53,6 +53,16 @@ def _onEvent(eventName, params):
     print "_onEvent:", eventName, "params:", params
 
 
+def queueExists(queue):
+    queueAvailable = queue in events
+
+    if not queueAvailable:
+        events[queue] = []
+        eventNotify[queue] = threading.Event()
+
+    return queueAvailable
+
+
 def waitForEvents(queue):
     """Wait for events in the event list and return
 
