@@ -16,6 +16,26 @@
 	background: #CCCCCC; 
 }
 
+#overlay {
+  visibility: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  background-color: rgba(0,0,0,0.5);
+}
+
+#overlay_text {
+  font-size: 32px;
+  position: relative;
+  top: 50%;
+  text-align: center;
+  transform: translateY(-50%);
+  color: #FFFFFF;
+}
+
 a:link .tool {
     color: #000000;
 }

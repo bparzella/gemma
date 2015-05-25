@@ -37,7 +37,8 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="{{ url_for('tools_list') }}">Tools</a></li>
+            <li class="tools_list tool_detail"><a href="{{ url_for('tools_list') }}">Tools</a></li>
+            <li class="process_programs"><a href="{{ url_for('process_programs') }}">Process Programs</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
@@ -54,3 +55,9 @@
   <div id="disableOverlay"><div id="disableOverlayText"><span id="disableOverlayIcon" class="glyphicon glyphicon-alert" aria-hidden="true"></span><br/>Server not running</div></div>
   </body>
 </html>
+
+<script>
+  $(document).ready(function () {
+    $(".{{request.endpoint}}").addClass("active"); 
+  });
+</script>

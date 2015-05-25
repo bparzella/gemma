@@ -15,10 +15,20 @@
 #####################################################################
 
 import os
+import shutil
+
+from werkzeug import secure_filename
+
+def getProcessProgramScopes():
+    return next(os.walk("data/processprogram/"))[1]
+
+
+def getProcessPrograms(processProgramScope):
+    return next(os.walk("data/processprogram/" + processProgramScope))[2]
 
 
 def processProgramFilename(processProgramScope, processProgramID):
-    return os.path.abspath("data/processprogram/" + processProgramScope + "/" + processProgramID)
+    return os.path.abspath("data/processprogram/{}/{}".format(processProgramScope, processProgramID))
 
 
 def getProcessProgram(processProgramScope, processProgramID):
@@ -42,3 +52,29 @@ def storeProcessProgram(processProgramScope, processProgramID, processProgramDat
 
     with open(filename, "w") as file:
         file.write(processProgramData)
+
+
+def processProgramCopy(processProgramScopeSource, processProgramID, processProgramScopeTarget):
+    return shutil.copy2(processProgramFilename(processProgramScopeSource, processProgramID), processProgramFilename(processProgramScopeTarget, processProgramID))
+
+
+def processProgramMove(processProgramScopeSource, processProgramID, processProgramScopeTarget):
+    return shutil.move(processProgramFilename(processProgramScopeSource, processProgramID), processProgramFilename(processProgramScopeTarget, processProgramID))
+
+
+def processProgramRename(processProgramScopeSource, processProgramID, processProgramIDNew):
+    return shutil.move(processProgramFilename(processProgramScopeSource, processProgramID), processProgramFilename(processProgramScopeSource, processProgramIDNew))
+
+
+def processProgramDuplicate(processProgramScopeSource, processProgramID, processProgramIDNew):
+    return shutil.copy2(processProgramFilename(processProgramScopeSource, processProgramID), processProgramFilename(processProgramScopeSource, processProgramIDNew))
+
+
+def processProgramRemove(processProgramScopeSource, processProgramID):
+    return os.remove(processProgramFilename(processProgramScopeSource, processProgramID))
+
+
+def processProgramUpload(processProgramScope, file):
+    filename = processProgramFilename(processProgramScope, secure_filename(file.filename))
+    file.save(filename)
+    return True

@@ -17,7 +17,7 @@
 from json_encoder import jsonEncoder
 from plugins import getToolType, loadModules
 from secs import connectionManager, addTool, waitForEvents, stop, queueExists, _onEvent
-from processprograms import getProcessProgram, storeProcessProgram
+from processprograms import getProcessProgram, storeProcessProgram, getProcessProgramScopes, getProcessPrograms, processProgramCopy, processProgramMove, processProgramDuplicate, processProgramRename, processProgramRemove, processProgramUpload
 import contextprocessor
 
 def stop():

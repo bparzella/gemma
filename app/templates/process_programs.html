@@ -1,0 +1,351 @@
+{% extends "layout.html" %}
+{% block body %}
+<div id="overlay"><div id="overlay_text"></div></div>
+<div id="droparea">
+  <div class="form-group">
+    <label for="processProgramScope">Process program scope:</label>
+    <select class="form-control" id="processProgramScope">
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="processPrograms">Process programs:</label>
+    <select multiple class="form-control" id="processPrograms" size=30 style='height: 100%;'>
+    </select>
+  </div>
+</div>
+
+<button type="button" class="btn btn-default" id="btnCopy">Copy</button>
+<button type="button" class="btn btn-default" id="btnMove">Move</button>
+<button type="button" class="btn btn-default" id="btnDuplicate">Duplicate</button>
+<button type="button" class="btn btn-default" id="btnRename">Rename</button>
+<button type="button" class="btn btn-danger" id="btnDelete">Delete</button>
+
+<div class="modal fade" id="dlgCopy" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Copy process programm</h4>
+      </div>
+      <div class="modal-body">
+        <label for="processProgramScopeCopy">Target scope</label>
+        <select class="form-control" id="processProgramScopeCopy">
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="dlgCopySubmit">Copy</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="dlgMove" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Move process programm</h4>
+      </div>
+      <div class="modal-body">
+        <label for="processProgramScopeMove">Target scope</label>
+        <select class="form-control" id="processProgramScopeMove">
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="dlgMoveSubmit">Move</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="dlgDuplicate" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Duplicate process programm</h4>
+      </div>
+      <div class="modal-body">
+        <label for="processProgramDuplicate">New name</label>
+        <input type="text" class="form-control" id="processProgramDuplicate">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="dlgDuplicateSubmit">Duplicate</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="dlgRename" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Rename process programm</h4>
+      </div>
+      <div class="modal-body">
+        <label for="processProgramRename">New name</label>
+        <input type="text" class="form-control" id="processProgramRename">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="dlgRenameSubmit">Rename</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="dlgDelete" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Delete process program</h4>
+      </div>
+      <div class="modal-body">
+      Are you sure?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+        <button type="button" class="btn btn-primary" id="dlgDeleteSubmit">Yes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+function updateButtonState() {
+    selected = $('#processPrograms').val();
+    if (selected == null)
+    {
+      $('#btnCopy').prop('disabled', true);
+      $('#btnMove').prop('disabled', true);
+      $('#btnDuplicate').prop('disabled', true);
+      $('#btnRename').prop('disabled', true);
+      $('#btnDelete').prop('disabled', true);
+    }
+    else
+    {
+      if (selected.length == 1)
+      {
+        $('#btnCopy').prop('disabled', false);
+        $('#btnMove').prop('disabled', false);
+        $('#btnDuplicate').prop('disabled', false);
+        $('#btnRename').prop('disabled', false);
+        $('#btnDelete').prop('disabled', false);
+      }
+      else
+      {
+        $('#btnCopy').prop('disabled', false);
+        $('#btnMove').prop('disabled', false);
+        $('#btnDuplicate').prop('disabled', true);
+        $('#btnRename').prop('disabled', true);
+        $('#btnDelete').prop('disabled', false);
+      }
+    }
+}
+
+function updateProcessPrograms(scope) {
+    $.getJSON('{{ url_for("process_programs_scope", scope="##scope##") }}'.replace(escape("##scope##"), scope), function(processPrograms) {
+      $('#processPrograms').empty();
+
+      $.each( processPrograms, function( index, processProgram ){
+        $("#processPrograms").append('<option value="' + processProgram + '">' + processProgram + '</option>');
+      });
+
+      updateButtonState();
+    });
+}
+
+function updateProcessProgramScopes(target) {
+    target = target || "#processProgramScope";
+
+    oldSelection = $(target).val();
+
+    $.getJSON('{{ url_for("process_programs_scopes") }}', function(processProgramScopes) {
+      $(target).empty();
+
+      $.each( processProgramScopes, function( index, processProgramScope ){
+        $(target).append('<option value="' + processProgramScope + '">' + processProgramScope + '</option>');
+      });
+
+      if (oldSelection != null)
+      {
+        $(target).val(oldSelection);
+      }
+
+     updateProcessPrograms($(target).val());
+   });
+}
+
+function setupDragDrop() {
+  droparea = $("#droparea");
+
+  droparea.on("dragenter", function(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    $("#overlay").css("visibility", "visible");
+    $("#overlay_text").text("Drop files to upload");
+  });
+
+  // On drag over...
+  droparea.on("dragover", function(e) {
+    e.stopPropagation();
+    e.preventDefault();
+  });
+
+  // On drop...
+  $("#overlay").on("drop", function(e) {
+    e.preventDefault();
+    $("#overlay_text").text("Uploading files...");
+
+    files = e.originalEvent.dataTransfer.files;
+
+    fd = new FormData();
+    for (var i = 0; i < files.length; i++) 
+    {
+      fd.append('file', files[i]);
+    }
+
+    uploadURL ='{{ url_for("process_program_upload", scope="##scope##") }}'.replace(escape("##scope##"), $("#processProgramScope").val());
+    var jqXHR=$.ajax(
+      {
+        xhr: function() {
+        var xhrobj = $.ajaxSettings.xhr();
+        if (xhrobj.upload) {
+          xhrobj.upload.addEventListener('progress', function(event) {
+          }, false);
+        }
+        return xhrobj;
+      },
+      url: uploadURL,
+      type: "POST",
+      contentType:false,
+      processData: false,
+      cache: false,
+      data: fd,
+      success: function(data){
+        updateProcessPrograms($("#processProgramScope").val());
+        $("#overlay").css("visibility", "hidden");
+      }
+    }); 
+  });
+
+  // If the files are dropped outside of the drop zone, the browser will
+  // redirect to show the files in the window. To avoid that we can prevent
+  // the 'drop' event on the document.
+  function stopDefault(e) {
+    e.stopPropagation();
+    e.preventDefault();
+  }
+
+  $(document).on("dragenter", stopDefault);
+  $(document).on("dragover", stopDefault);
+  $(document).on("drop", stopDefault);
+}
+
+$(document).ready(function(){
+  updateProcessProgramScopes();
+
+  setupDragDrop();
+
+  $('#processProgramScope').on('change', function() {
+    updateProcessPrograms(this.value);
+  });
+
+  $('#processPrograms').on('change', function() {
+    updateButtonState();
+  });
+
+  $("#btnCopy").click(function(){
+    updateProcessProgramScopes("#processProgramScopeCopy");
+    $('#dlgCopy').modal('show');
+  });
+
+  $("#dlgCopySubmit").click(function(){
+    if ($("#processProgramScopeCopy").val() == $("#processProgramScope").val()) {
+      alert("Source and target are the same");
+      return;
+    }
+
+    $.each( $('#processPrograms').val(), function( index, processProgram ){
+      $.ajax('{{ url_for("process_program_copy", scope="##scope##", program="##program##", targetScope="##targetScope##", _external=True) }}'.replace(escape("##scope##"), $("#processProgramScope").val()).replace(escape("##targetScope##"), $("#processProgramScopeCopy").val()).replace(escape("##program##"), processProgram), {async: false});
+    });
+
+    $('#dlgCopy').modal('hide');
+
+    updateProcessPrograms($("#processProgramScope").val());
+  });
+
+  $("#btnMove").click(function(){
+    updateProcessProgramScopes("#processProgramScopeMove");
+    $('#dlgMove').modal('show');
+  });
+
+  $("#dlgMoveSubmit").click(function(){
+    if ($("#processProgramScopeMove").val() == $("#processProgramScope").val()) {
+      alert("Source and target are the same");
+      return;
+    }
+
+    $.each( $('#processPrograms').val(), function( index, processProgram ){
+      $.ajax('{{ url_for("process_program_move", scope="##scope##", program="##program##", targetScope="##targetScope##", _external=True) }}'.replace(escape("##scope##"), $("#processProgramScope").val()).replace(escape("##targetScope##"), $("#processProgramScopeMove").val()).replace(escape("##program##"), processProgram), {async: false});
+    });
+
+    $('#dlgMove').modal('hide');
+
+    updateProcessPrograms($("#processProgramScope").val());
+  });
+
+  $("#btnDuplicate").click(function() {
+    $("#processProgramDuplicate").val($('#processPrograms').val());
+    $('#dlgDuplicate').modal('show');
+  });
+
+  $("#dlgDuplicateSubmit").click(function(){
+    $.each( $('#processPrograms').val(), function( index, processProgram ) {
+      $.ajax('{{ url_for("process_program_duplicate", scope="##scope##", program="##program##", newProgram="##newProgram##", _external=True) }}'.replace(escape("##scope##"), $("#processProgramScope").val()).replace(escape("##newProgram##"), $("#processProgramDuplicate").val()).replace(escape("##program##"), processProgram), {async: false});
+    });
+
+    $('#dlgDuplicate').modal('hide');
+
+    updateProcessPrograms($("#processProgramScope").val());
+  });
+
+  $("#btnRename").click(function() {
+    $("#processProgramRename").val($('#processPrograms').val());
+    $('#dlgRename').modal('show');
+  });
+
+  $("#dlgRenameSubmit").click(function(){
+    $.each( $('#processPrograms').val(), function( index, processProgram ) {
+      $.ajax('{{ url_for("process_program_rename", scope="##scope##", program="##program##", newProgram="##newProgram##", _external=True) }}'.replace(escape("##scope##"), $("#processProgramScope").val()).replace(escape("##newProgram##"), $("#processProgramRename").val()).replace(escape("##program##"), processProgram), {async: false});
+    });
+
+    $('#dlgRename').modal('hide');
+
+    updateProcessPrograms($("#processProgramScope").val());
+  });
+
+  $("#btnDelete").click(function(){
+    $('#dlgDelete').modal('show');
+  });
+
+  $("#dlgDeleteSubmit").click(function(){
+    $.each( $('#processPrograms').val(), function( index, processProgram ){
+      $.ajax('{{ url_for("process_program_remove", scope="##scope##", program="##program##", _external=True) }}'.replace(escape("##scope##"), $("#processProgramScope").val()).replace(escape("##program##"), processProgram), {async: false});
+    });
+
+    $('#dlgDelete').modal('hide');
+
+    updateProcessPrograms($("#processProgramScope").val());
+  });
+
+});
+</script>
+
+{% endblock %}

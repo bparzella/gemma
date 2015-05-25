@@ -22,3 +22,4 @@ import tool_terminal
 import tool_remotecommand
 import tool_sv
 import tool_ec
+import process_programs
