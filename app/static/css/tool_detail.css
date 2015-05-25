@@ -1,0 +1,19 @@
+#toolCollectionEventsTable {
+     margin-bottom: 0px;
+}
+
+#toolCollectionEventsTable table {
+     margin-bottom: 0px;
+}
+
+#terminal {
+  background-color: black;
+  color: white;
+  display:block;
+  height: 400px;
+  overflow:scroll;
+}
+
+#overlay_disable_icon {
+  font-size: 5em;
+}

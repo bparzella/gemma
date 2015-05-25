@@ -322,7 +322,8 @@ $(document).ready(function(){
     //comet functions
     function doComet(queue) {
         $.getJSON('{{ url_for("tool_comet", toolname=tool.name, queue="##queue##", _external=True) }}'.replace(escape("##queue##"), queue), function(events){
-            $("#disableOverlay").hide();
+            $("#overlay").css("visibility", "hidden");
+
             $.each( events, function( index, event ){
                 console.log(event);
                 switch(event.event)
@@ -342,7 +343,8 @@ $(document).ready(function(){
             });
             doComet(queue);
         }).fail(function( jqxhr, textStatus, error ) {
-            $("#disableOverlay").show();
+            $("#overlay").css("visibility", "visible");
+            $("#overlay_text").html('<span id="overlay_disable_icon" class="glyphicon glyphicon-alert" aria-hidden="true"></span><br/>Server not running');
 
             var err = textStatus + ", " + error;
             console.log( "Request Failed: " + err );

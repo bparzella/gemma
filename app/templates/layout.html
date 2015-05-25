@@ -10,12 +10,14 @@
 
     <title>gemma</title>
 
-    <link href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
-    <script src="{{ url_for('static', filename='jquery-2.1.3.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='handlebars.js') }}"></script>
-    <script src="{{ url_for('static', filename='typeahead.js') }}"></script>
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/' + request.endpoint + '.css') }}" rel="stylesheet">
+    <script src="{{ url_for('static', filename='js/jquery-2.1.3.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/handlebars.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/typeahead.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/' + request.endpoint + '.js') }}"></script>
 
     <style type="text/css">
       body { padding-top: 50px; }
@@ -52,7 +54,7 @@
       {% block body %}{% endblock %}
 
     </div><!-- /.container -->
-  <div id="disableOverlay"><div id="disableOverlayText"><span id="disableOverlayIcon" class="glyphicon glyphicon-alert" aria-hidden="true"></span><br/>Server not running</div></div>
+    <div id="overlay"><div id="overlay_text"></div></div>
   </body>
 </html>
 
