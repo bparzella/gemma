@@ -26,8 +26,6 @@ app.config.from_object('config')
 
 db = SQLAlchemy(app)
 
-db.create_all()
-
 import helpers
 
 toolHandlers = helpers.loadModules("plugins/toolhandlers")
@@ -37,6 +35,8 @@ import controllers
 import views
 # from models import *
 # from controllers import *
+
+db.create_all()
 
 # instanciate all configured tools
 for tool in models.Tool.query.all():
