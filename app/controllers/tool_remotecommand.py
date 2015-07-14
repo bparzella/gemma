@@ -36,14 +36,14 @@ def tool_remotecommand_details(toolname, rcmd):
 
 @app.route("/tools/<toolname>/remotecommand/<rcmd>/run")
 def tool_remotecommand_run(toolname, rcmd):
-    peer = helpers.connectionManager[toolname]
+    handler = helpers.connectionManager[toolname]
 
     params = []
 
     for param in request.args:
         params.append((param, request.args[param]))
 
-    result = peer.sendRemoteCommand(rcmd, params)
+    result = handler.sendRemoteCommand(rcmd, params)
 
     HCACK = result.HCACK
 

@@ -26,15 +26,15 @@ eventNotify = {}
 
 
 def ceSetup(event, data):
-    peer = data['peer']
+    handler = data['handler']
 
-    peer.clearCollectionEvents()
+    handler.clearCollectionEvents()
 
-    for collectionEvent in peer.registeredCollectionEvents:
+    for collectionEvent in handler.registeredCollectionEvents:
         ceid = collectionEvent[0]
         dvids = collectionEvent[1]
-        if ceid in peer.ceids:
-            peer.subscribeCollectionEvent(ceid, dvids)
+        if ceid in handler.ceids:
+            handler.subscribeCollectionEvent(ceid, dvids)
         else:
             print "configured ceid %d not found" % (collectionEvent)
 
@@ -92,7 +92,7 @@ def waitForEvents(queue):
     return result
 
 # setup event handler
-eventHandler = secsgem.EventHandler(events={'PeerInitialized': ceSetup}, genericHandler=_onEvent)
+eventHandler = secsgem.EventHandler(events={'HandlerCommunicating': ceSetup}, genericHandler=_onEvent)
 
 # setup connection manager
 connectionManager = secsgem.hsmsConnectionManager(eventHandler=eventHandler)
@@ -106,7 +106,7 @@ def addTool(tool):
     toolType = getToolType(tool)
 
     # add configured tool to the connectionmanager
-    peer = connectionManager.addPeer(tool.name, tool.address, tool.port, tool.passive, tool.device_id, toolType)
+    handler = connectionManager.addPeer(tool.name, tool.address, tool.port, tool.passive, tool.device_id, toolType)
 
     ceids = []
     for collection_event in tool.collection_events:
@@ -116,7 +116,7 @@ def addTool(tool):
 
         ceids.append((collection_event.ceid, dvids))
 
-    peer.registeredCollectionEvents = ceids
+    handler.registeredCollectionEvents = ceids
 
 
 def stop():

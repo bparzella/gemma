@@ -20,14 +20,14 @@ from flask import request
 
 @app.route("/tools/<toolname>/ec/<ecid>", methods=['POST', 'GET'])
 def tool_ec(toolname, ecid):
-    peer = helpers.connectionManager[toolname]
+    handler = helpers.connectionManager[toolname]
     if request.method == 'POST':
-        result = peer.requestEC(int(ecid)).format.data[0].value
+        result = handler.requestEC(int(ecid)).format.data[0].value
         result.set(request.form["value"])
-        result = peer.setEC(int(ecid), result)
+        result = handler.setEC(int(ecid), result)
 
         return str(result)
     else:
-        result = peer.requestEC(int(ecid))[0]
+        result = handler.requestEC(int(ecid))[0]
 
         return str(result)

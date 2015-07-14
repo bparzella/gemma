@@ -19,8 +19,8 @@ from app import app, helpers
 
 @app.route("/tools/<toolname>/sv/<svid>")
 def tool_sv(toolname, svid):
-    peer = helpers.connectionManager[toolname]
-    result = peer.requestSV(int(svid))
+    handler = helpers.connectionManager[toolname]
+    result = handler.requestSV(int(svid))
 
     if isinstance(result, list):
         return str(result)

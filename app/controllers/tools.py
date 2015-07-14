@@ -27,17 +27,17 @@ def tools_list():
 
 @app.route("/tools/<toolname>")
 def tool_detail(toolname):
-    peer = helpers.connectionManager[toolname]
+    handler = helpers.connectionManager[toolname]
     tool = models.Tool.query.filter(models.Tool.name == toolname).first()
 
-    if peer and peer.connection:
-        SVs = sorted(peer.listSVs(), key=lambda SV: SV.SVID)
-        ECs = sorted(peer.listECs(), key=lambda EC: EC.ECID)
+    if handler and handler.connection.connected:
+        SVs = sorted(handler.listSVs(), key=lambda SV: SV.SVID)
+        ECs = sorted(handler.listECs(), key=lambda EC: EC.ECID)
     else:
         SVs = {}
         ECs = {}
 
-    return render_template("tool_detail.html", peer=peer, tool=tool, modules=toolHandlers, svids=SVs, ecids=ECs)
+    return render_template("tool_detail.html", handler=handler, tool=tool, modules=toolHandlers, svids=SVs, ecids=ECs)
 
 
 @app.route("/tools/<toolname>/restart")
@@ -54,12 +54,12 @@ def tool_restart(toolname):
 
 @app.route("/tools/<toolname>/comet/<queue>")
 def tool_comet(toolname, queue):
-    peer = helpers.connectionManager[toolname]
+    handler = helpers.connectionManager[toolname]
 
     if not helpers.queueExists(queue):
         return json.dumps({}, default=helpers.jsonEncoder, encoding='latin1')
 
-    if peer is None:
+    if handler is None:
         time.sleep(2)
         return json.dumps([])
 

@@ -36,7 +36,7 @@ def loadModules(path):
 
 def getToolType(tool):
     # set default handler
-    toolType = secsgem.secsDefaultHandler
+    toolType = secsgem.secsHandler
 
     # check if module loaded for tooltype
     if tool.type in globals():
@@ -47,7 +47,7 @@ def getToolType(tool):
             # get loaded class
             classType = module.__dict__[tool.type]
             # check if class is correct type
-            if issubclass(classType, secsgem.secsDefaultHandler):
+            if issubclass(classType, secsgem.secsHandler):
                 toolType = classType
 
     return toolType

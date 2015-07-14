@@ -14,30 +14,23 @@
 # GNU Lesser General Public License for more details.
 #####################################################################
 
-from secsgem import *
+from secsgem import gemHandler
 
 from app import helpers, models
 
-class gemmaDefaultHandler(gemDefaultHandler):
-    def __init__(self, address, port, active, sessionID, name, eventHandler=None):
-        gemDefaultHandler.__init__(self, address, port, active, sessionID, name, eventHandler)
 
-    def _setConnection(self, connection):
-        """Set the connection of the for this models. Called by :class:`secsgem.hsmsHandler.hsmsConnectionManager`.
+class gemmaDefaultHandler(gemHandler):
+    def __init__(self, address, port, active, sessionID, name, eventHandler=None, customConnectionHandler=None):
+        gemHandler.__init__(self, address, port, active, sessionID, name, eventHandler, customConnectionHandler)
 
-        :param connection: The connection the model uses
-        :type connection: :class:`secsgem.hsmsConnections.hsmsConnection`
-        """
-        gemDefaultHandler._setConnection(self, connection)
+        self.registerCallback(7, 3, self.S7F3Handler)
+        self.registerCallback(7, 5, self.S7F5Handler)
 
-        self.connection.registerCallback(7, 3, self.S7F3Handler)
-        self.connection.registerCallback(7, 5, self.S7F5Handler)
-
-        self.connection.registerCallback(12, 1, self.S12F1Handler)
-        self.connection.registerCallback(12, 3, self.S12F3Handler)
-        self.connection.registerCallback(12, 5, self.S12F5Handler)
-        self.connection.registerCallback(12, 9, self.S12F9Handler)
-        self.connection.registerCallback(12, 15, self.S12F15Handler)
+        self.registerCallback(12, 1, self.S12F1Handler)
+        self.registerCallback(12, 3, self.S12F3Handler)
+        self.registerCallback(12, 5, self.S12F5Handler)
+        self.registerCallback(12, 9, self.S12F9Handler)
+        self.registerCallback(12, 15, self.S12F15Handler)
 
     def S7F3Handler(self, connection, packet):
         """Callback handler for Stream 7, Function 3, Process Program Send - Request.
@@ -56,7 +49,7 @@ class gemmaDefaultHandler(gemDefaultHandler):
         helpers.storeProcessProgram(tool.process_program_scope, message.PPID, message.PPBODY)
         connection.sendResponse(self.streamFunction(7, 4)(0), packet.header.system)
 
-        data = {"processProgramScope": tool.process_program_scope, "processProgramID": message.PPID, "connection": self.connection, 'peer': self}
+        data = {"processProgramScope": tool.process_program_scope, "processProgramID": message.PPID, "connection": self.connection, 'handler': self}
         self.fireEvent("ProcessProgramStored", data)
 
     def S7F5Handler(self, connection, packet):
@@ -78,7 +71,7 @@ class gemmaDefaultHandler(gemDefaultHandler):
         if data:
             connection.sendResponse(self.streamFunction(7, 6)({"PPID": message.get(), "PPBODY": data}), packet.header.system)
 
-        data = {"processProgramScope": tool.process_program_scope, "processProgramID": message.get(), "connection": self.connection, 'peer': self}
+        data = {"processProgramScope": tool.process_program_scope, "processProgramID": message.get(), "connection": self.connection, 'handler': self}
         self.fireEvent("ProcessProgramRetrieved", data)
 
     def S12F1Handler(self, connection, packet):

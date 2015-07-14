@@ -20,12 +20,12 @@ from flask import request, abort
 
 @app.route("/tools/<toolname>/terminal/<TID>", methods=['POST', 'GET'])
 def tool_terminal(toolname, TID):
-    peer = helpers.connectionManager[toolname]
+    handler = helpers.connectionManager[toolname]
 
-    if peer is None:
+    if handler is None:
         abort(404)
 
     if request.method == 'POST':
-        peer.sendEquipmentTerminal(int(TID), request.form["text"].encode('ascii','replace'))
+        handler.sendEquipmentTerminal(int(TID), request.form["text"].encode('ascii','replace'))
 
     return "OK"
