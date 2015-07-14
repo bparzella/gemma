@@ -65,3 +65,7 @@ gemma.db
 # Data
 data/processprogram/*/*
 data/map/*
+
+# IDE
+.idea
+
