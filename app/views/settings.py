@@ -63,7 +63,7 @@ class DialogSettings(Form):
 
         if restartRequired:
             if helpers.connectionManager.hasConnectionTo(tool.name):
-                helpers.connectionManager.removePeer(tool.name, tool.address, tool.port, tool.device_id)
+                helpers.connectionManager.removePeer(tool.name, tool.address, tool.port)
 
         tool.enabled = self.enabled.data
         tool.type = self.type.data

@@ -92,10 +92,10 @@ def waitForEvents(queue):
     return result
 
 # setup event handler
-eventHandler = secsgem.EventHandler(events={'HandlerCommunicating': ceSetup}, genericHandler=_onEvent)
+eventHandler = secsgem.EventHandler(events={'HandlerCommunicating': ceSetup}, generic_handler=_onEvent)
 
 # setup connection manager
-connectionManager = secsgem.hsmsConnectionManager(eventHandler=eventHandler)
+connectionManager = secsgem.hsmsConnectionManager(event_handler=eventHandler)
 
 
 def addTool(tool):

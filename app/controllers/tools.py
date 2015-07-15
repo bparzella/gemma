@@ -45,7 +45,7 @@ def tool_restart(toolname):
     tool = models.Tool.query.filter(models.Tool.name == toolname).first()
 
     if helpers.connectionManager.hasConnectionTo(tool.name):
-        helpers.connectionManager.removePeer(tool.name, tool.address, tool.port, tool.device_id)
+        helpers.connectionManager.removePeer(tool.name, tool.address, tool.port)
 
     helpers.addTool(tool)
 
