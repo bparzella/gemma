@@ -19,7 +19,7 @@ from flask.ext.sqlalchemy import SQLAlchemy
 
 import logging
 
-logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s %(name)s.%(funcName)s: %(message)s', level=logging.DEBUG)
 
 app = Flask(__name__)
 app.config.from_object('config')
