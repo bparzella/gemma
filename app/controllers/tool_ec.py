@@ -22,12 +22,12 @@ from flask import request
 def tool_ec(toolname, ecid):
     handler = helpers.connectionManager[toolname]
     if request.method == 'POST':
-        result = handler.requestEC(int(ecid)).format.data[0].value
+        result = handler.request_ec(int(ecid)).format.data[0].value
         result.set(request.form["value"])
-        result = handler.setEC(int(ecid), result)
+        result = handler.set_ec(int(ecid), result)
 
         return str(result)
     else:
-        result = handler.requestEC(int(ecid))[0]
+        result = handler.request_ec(int(ecid))[0]
 
         return str(result)

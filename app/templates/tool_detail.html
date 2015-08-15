@@ -328,11 +328,11 @@ $(document).ready(function(){
                 console.log(event);
                 switch(event.event)
                 {
-                    case "TerminalReceived":
+                    case "terminal_received":
                         $('#terminal').append("&gt;" + event.terminal + ":" + event.text + "<br />");
                         $('#terminal').scrollTop($('#terminal')[0].scrollHeight);
                         break;
-                    case "CollectionEventReceived":
+                    case "collection_event_received":
                         valueText = "";
                         $.each(event.values, function(index, value){
                             valueText += value.name + "=" + value.value + "<br />"

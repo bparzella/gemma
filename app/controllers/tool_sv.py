@@ -20,7 +20,7 @@ from app import app, helpers
 @app.route("/tools/<toolname>/sv/<svid>")
 def tool_sv(toolname, svid):
     handler = helpers.connectionManager[toolname]
-    result = handler.requestSV(int(svid))
+    result = handler.request_sv(int(svid))
 
     if isinstance(result, list):
         return str(result)

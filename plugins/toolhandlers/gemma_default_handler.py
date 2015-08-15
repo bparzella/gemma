@@ -14,23 +14,23 @@
 # GNU Lesser General Public License for more details.
 #####################################################################
 
-from secsgem import gemHandler
+from secsgem import GemHandler
 
 from app import helpers, models
 
 
-class gemmaDefaultHandler(gemHandler):
+class gemmaDefaultHandler(GemHandler):
     def __init__(self, address, port, active, sessionID, name, eventHandler=None, customConnectionHandler=None):
-        gemHandler.__init__(self, address, port, active, sessionID, name, eventHandler, customConnectionHandler)
+        GemHandler.__init__(self, address, port, active, sessionID, name, eventHandler, customConnectionHandler)
 
-        self.registerCallback(7, 3, self.S7F3Handler)
-        self.registerCallback(7, 5, self.S7F5Handler)
+        self.register_callback(7, 3, self.S7F3Handler)
+        self.register_callback(7, 5, self.S7F5Handler)
 
-        self.registerCallback(12, 1, self.S12F1Handler)
-        self.registerCallback(12, 3, self.S12F3Handler)
-        self.registerCallback(12, 5, self.S12F5Handler)
-        self.registerCallback(12, 9, self.S12F9Handler)
-        self.registerCallback(12, 15, self.S12F15Handler)
+        self.register_callback(12, 1, self.S12F1Handler)
+        self.register_callback(12, 3, self.S12F3Handler)
+        self.register_callback(12, 5, self.S12F5Handler)
+        self.register_callback(12, 9, self.S12F9Handler)
+        self.register_callback(12, 15, self.S12F15Handler)
 
     def S7F3Handler(self, connection, packet):
         """Callback handler for Stream 7, Function 3, Process Program Send - Request.
@@ -42,15 +42,15 @@ class gemmaDefaultHandler(gemHandler):
         :param packet: complete message received
         :type packet: :class:`secsgem.hsmsPackets.hsmsPacket`
         """
-        message = self.secsDecode(packet)
+        message = self.secs_decode(packet)
 
         tool = models.Tool.query.filter(models.Tool.name == self.name).first()
 
         helpers.storeProcessProgram(tool.process_program_scope, message.PPID, message.PPBODY)
-        connection.sendResponse(self.streamFunction(7, 4)(0), packet.header.system)
+        connection.sendResponse(self.stream_function(7, 4)(0), packet.header.system)
 
         data = {"processProgramScope": tool.process_program_scope, "processProgramID": message.PPID, "connection": self.connection, 'handler': self}
-        self.fireEvent("ProcessProgramStored", data)
+        self.fire_event("ProcessProgramStored", data)
 
     def S7F5Handler(self, connection, packet):
         """Callback handler for Stream 7, Function 5, Process Program Send - Request.
@@ -62,17 +62,17 @@ class gemmaDefaultHandler(gemHandler):
         :param packet: complete message received
         :type packet: :class:`secsgem.hsmsPackets.hsmsPacket`
         """
-        message = self.secsDecode(packet)
+        message = self.secs_decode(packet)
 
         tool = models.Tool.query.filter(models.Tool.name == self.name).first()
 
         data = helpers.getProcessProgram(tool.process_program_scope, message.get())
         
         if data:
-            connection.sendResponse(self.streamFunction(7, 6)({"PPID": message.get(), "PPBODY": data}), packet.header.system)
+            connection.sendResponse(self.stream_function(7, 6)({"PPID": message.get(), "PPBODY": data}), packet.header.system)
 
         data = {"processProgramScope": tool.process_program_scope, "processProgramID": message.get(), "connection": self.connection, 'handler': self}
-        self.fireEvent("ProcessProgramRetrieved", data)
+        self.fire_event("ProcessProgramRetrieved", data)
 
     def S12F1Handler(self, connection, packet):
         """Callback handler for Stream 12, Function 1, map setup data - send
@@ -84,11 +84,11 @@ class gemmaDefaultHandler(gemHandler):
         :param packet: complete message received
         :type packet: :class:`secsgem.hsmsPackets.hsmsPacket`
         """
-        message = self.secsDecode(packet)
+        message = self.secs_decode(packet)
 
         print message
 
-        s12f02 = self.streamFunction(12, 2)(value=0)
+        s12f02 = self.stream_function(12, 2)(value=0)
 
         print s12f02
 
@@ -104,13 +104,13 @@ class gemmaDefaultHandler(gemHandler):
         :param packet: complete message received
         :type packet: :class:`secsgem.hsmsPackets.hsmsPacket`
         """
-        message = self.secsDecode(packet)
+        message = self.secs_decode(packet)
 
         print message
 
         map = models.G85Map.load("data/map/"+message.MID+".xml", message.MID)
 
-        s12f04 = self.streamFunction(12, 4)()
+        s12f04 = self.stream_function(12, 4)()
         s12f04.MID = message.MID
         s12f04.IDTYP = message.IDTYP
         s12f04.FNLOC = message.FNLOC
@@ -142,11 +142,11 @@ class gemmaDefaultHandler(gemHandler):
         :param packet: complete message received
         :type packet: :class:`secsgem.hsmsPackets.hsmsPacket`
         """
-        message = self.secsDecode(packet)
+        message = self.secs_decode(packet)
 
         print message
 
-        s12f06 = self.streamFunction(12, 6)(value=0)
+        s12f06 = self.stream_function(12, 6)(value=0)
 
         print s12f06
 
@@ -162,11 +162,11 @@ class gemmaDefaultHandler(gemHandler):
         :param packet: complete message received
         :type packet: :class:`secsgem.hsmsPackets.hsmsPacket`
         """
-        message = self.secsDecode(packet)
+        message = self.secs_decode(packet)
 
         print message
 
-        s12f10 = self.streamFunction(12, 10)(value=0)
+        s12f10 = self.stream_function(12, 10)(value=0)
 
         print s12f10
 
@@ -182,11 +182,11 @@ class gemmaDefaultHandler(gemHandler):
         :param packet: complete message received
         :type packet: :class:`secsgem.hsmsPackets.hsmsPacket`
         """
-        message = self.secsDecode(packet)
+        message = self.secs_decode(packet)
 
         map = models.G85Map.load("data/map/"+message.MID+".xml", message.MID)
 
-        s12f16 = self.streamFunction(12, 16)()
+        s12f16 = self.stream_function(12, 16)()
         s12f16.MID = message.MID
         s12f16.IDTYP = message.IDTYP
         s12f16.STRP = [0, 0]

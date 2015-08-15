@@ -69,8 +69,8 @@ def tool_settings(toolname):
             restartRequired = True
 
         if restartRequired:
-            if helpers.connectionManager.hasConnectionTo(tool.name):
-                helpers.connectionManager.removePeer(tool.name, tool.address, tool.port)
+            if helpers.connectionManager.has_connection_to(tool.name):
+                helpers.connectionManager.remove_peer(tool.name, tool.address, tool.port)
 
         tool.enabled = formEnabled
         tool.type = formType

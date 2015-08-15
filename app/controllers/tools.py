@@ -31,8 +31,8 @@ def tool_detail(toolname):
     tool = models.Tool.query.filter(models.Tool.name == toolname).first()
 
     if handler and handler.connection.connected:
-        SVs = sorted(handler.listSVs(), key=lambda SV: SV.SVID)
-        ECs = sorted(handler.listECs(), key=lambda EC: EC.ECID)
+        SVs = sorted(handler.list_svs(), key=lambda SV: SV.SVID)
+        ECs = sorted(handler.list_ecs(), key=lambda EC: EC.ECID)
     else:
         SVs = {}
         ECs = {}
@@ -44,8 +44,8 @@ def tool_detail(toolname):
 def tool_restart(toolname):
     tool = models.Tool.query.filter(models.Tool.name == toolname).first()
 
-    if helpers.connectionManager.hasConnectionTo(tool.name):
-        helpers.connectionManager.removePeer(tool.name, tool.address, tool.port)
+    if helpers.connectionManager.has_connection_to(tool.name):
+        helpers.connectionManager.remove_peer(tool.name, tool.address, tool.port)
 
     helpers.addTool(tool)
 

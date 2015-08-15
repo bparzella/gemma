@@ -47,7 +47,7 @@ def getToolType(tool):
             # get loaded class
             classType = module.__dict__[tool.type]
             # check if class is correct type
-            if issubclass(classType, secsgem.secsHandler):
+            if issubclass(classType, secsgem.SecsHandler):
                 toolType = classType
 
     return toolType

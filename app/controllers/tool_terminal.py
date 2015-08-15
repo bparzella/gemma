@@ -26,6 +26,6 @@ def tool_terminal(toolname, TID):
         abort(404)
 
     if request.method == 'POST':
-        handler.sendEquipmentTerminal(int(TID), request.form["text"].encode('ascii','replace'))
+        handler.send_equipment_terminal(int(TID), request.form["text"].encode('ascii','replace'))
 
     return "OK"

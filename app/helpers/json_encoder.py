@@ -19,7 +19,7 @@ def jsonEncoder(o):
     if isinstance(o, set):
         return list(o)
 
-    if hasattr(o, "_serializeData") and callable(getattr(o, "_serializeData")):
-        return getattr(o, "_serializeData")()
+    if hasattr(o, "_serialize_data") and callable(getattr(o, "_serialize_data")):
+        return getattr(o, "_serialize_data")()
     else:
         return o.__dict__

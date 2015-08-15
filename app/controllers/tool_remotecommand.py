@@ -43,7 +43,7 @@ def tool_remotecommand_run(toolname, rcmd):
     for param in request.args:
         params.append((param, request.args[param]))
 
-    result = handler.sendRemoteCommand(rcmd, params)
+    result = handler.send_remote_command(rcmd, params)
 
     HCACK = result.HCACK
 

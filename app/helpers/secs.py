@@ -28,13 +28,13 @@ eventNotify = {}
 def ceSetup(event, data):
     handler = data['handler']
 
-    handler.clearCollectionEvents()
+    handler.clear_collection_events()
 
     for collectionEvent in handler.registeredCollectionEvents:
         ceid = collectionEvent[0]
         dvids = collectionEvent[1]
         if ceid in handler.ceids:
-            handler.subscribeCollectionEvent(ceid, dvids)
+            handler.subscribe_collection_event(ceid, dvids)
         else:
             print "configured ceid %d not found" % (collectionEvent)
 
@@ -92,10 +92,10 @@ def waitForEvents(queue):
     return result
 
 # setup event handler
-eventHandler = secsgem.EventHandler(events={'HandlerCommunicating': ceSetup}, generic_handler=_onEvent)
+eventHandler = secsgem.EventHandler(events={'handler_communicating': ceSetup}, generic_handler=_onEvent)
 
 # setup connection manager
-connectionManager = secsgem.hsmsConnectionManager(event_handler=eventHandler)
+connectionManager = secsgem.HsmsConnectionManager(event_handler=eventHandler)
 
 
 def addTool(tool):
@@ -106,7 +106,7 @@ def addTool(tool):
     toolType = getToolType(tool)
 
     # add configured tool to the connectionmanager
-    handler = connectionManager.addPeer(tool.name, tool.address, tool.port, tool.passive, tool.device_id, toolType)
+    handler = connectionManager.add_peer(tool.name, tool.address, tool.port, tool.passive, tool.device_id, toolType)
 
     ceids = []
     for collection_event in tool.collection_events:
