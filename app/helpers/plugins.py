@@ -36,7 +36,7 @@ def loadModules(path):
 
 def getToolType(tool):
     # set default handler
-    toolType = secsgem.secsHandler
+    toolType = secsgem.SecsHandler
 
     # check if module loaded for tooltype
     if tool.type in globals():
