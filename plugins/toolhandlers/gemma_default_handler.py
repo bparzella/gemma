@@ -19,7 +19,7 @@ from secsgem import GemHandler
 from app import helpers, models
 
 
-class gemmaDefaultHandler(GemHandler):
+class gemma_default_handler(GemHandler):
     def __init__(self, address, port, active, sessionID, name, eventHandler=None, customConnectionHandler=None):
         GemHandler.__init__(self, address, port, active, sessionID, name, eventHandler, customConnectionHandler)
 
