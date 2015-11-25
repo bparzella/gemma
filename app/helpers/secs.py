@@ -36,7 +36,7 @@ def ceSetup(event, data):
         if ceid in handler.ceids:
             handler.subscribe_collection_event(ceid, dvids)
         else:
-            print "configured ceid %d not found" % (collectionEvent)
+            print "configured ceid %d not found" % (ceid)
 
 
 def _onEvent(eventName, params):
