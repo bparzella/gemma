@@ -100,13 +100,21 @@ def tool_settings_collectionevents(toolname):
     for collection_event in tool.collection_events:
         collectionEvent = {}
         collectionEvent["ID"] = collection_event.ceid
-        collectionEvent["name"] = toolType.ceids[collection_event.ceid]["name"]
+        if collection_event.ceid in toolType.ceids:
+            collectionEvent["name"] = toolType.ceids[collection_event.ceid]["name"]
+        else:
+            collectionEvent["name"] = str(collection_event.ceid)
 
         dataValues = []
         for dv in collection_event.dvs:
             dataValue = {}
             dataValue["ID"] = dv.dvid
-            dataValue["name"] = toolType.dvs[dv.dvid]["name"]
+            
+            if dv.dvid in toolType.dvs:
+                dataValue["name"] = toolType.dvs[dv.dvid]["name"]
+            else:
+                dataValue["name"] = str(dv.dvid)
+
             dataValues.append(dataValue)
 
         collectionEvent["DVIDs"] = dataValues
