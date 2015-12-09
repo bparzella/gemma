@@ -14,14 +14,14 @@
 # GNU Lesser General Public License for more details.
 #####################################################################
 
-from secsgem import GemHandler
+from secsgem import GemHostHandler
 
 from app import helpers, models
 
 
-class gemma_default_handler(GemHandler):
+class gemma_default_handler(GemHostHandler):
     def __init__(self, address, port, active, sessionID, name, eventHandler=None, customConnectionHandler=None):
-        GemHandler.__init__(self, address, port, active, sessionID, name, eventHandler, customConnectionHandler)
+        GemHostHandler.__init__(self, address, port, active, sessionID, name, eventHandler, customConnectionHandler)
 
         self.register_callback(7, 3, self.S7F3Handler)
         self.register_callback(7, 5, self.S7F5Handler)
