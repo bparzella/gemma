@@ -21,17 +21,17 @@ from flask import request, json
 @app.route("/tools/<toolname>/remotecommands")
 def tool_remotecommands(toolname):
     tool = models.Tool.query.filter(models.Tool.name == toolname).first()
-    toolType = helpers.getToolType(tool)
+    tool_connection = helpers.connectionManager[tool.name]
 
-    return json.dumps(toolType.rcmds.keys())
+    return json.dumps(tool_connection.remote_commands.keys())
 
 
 @app.route("/tools/<toolname>/remotecommand/<rcmd>")
 def tool_remotecommand_details(toolname, rcmd):
     tool = models.Tool.query.filter(models.Tool.name == toolname).first()
-    toolType = helpers.getToolType(tool)
+    tool_connection = helpers.connectionManager[tool.name]
 
-    return json.dumps(toolType.rcmds[rcmd])
+    return json.dumps(tool_connection.remote_commands[rcmd])
 
 
 @app.route("/tools/<toolname>/remotecommand/<rcmd>/run")

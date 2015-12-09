@@ -50,22 +50,22 @@ def tool_settings(toolname):
         formProcessProgramScope = request.form["processProgramScope"]
 
         if not formEnabled == tool.enabled:
-            logging.info("tool_settings_update("+toolname+"): Enabled changed, reconnect required")
+            logging.info("tool_settings_update(" + toolname + "): Enabled changed, reconnect required")
             restartRequired = True
         if not formType == tool.type:
-            logging.info("tool_settings_update("+toolname+"): Type changed, reconnect required")
+            logging.info("tool_settings_update(" + toolname + "): Type changed, reconnect required")
             restartRequired = True
         if not formAddress == tool.address:
-            logging.info("tool_settings_update("+toolname+"): Address changed, reconnect required")
+            logging.info("tool_settings_update(" + toolname + "): Address changed, reconnect required")
             restartRequired = True
         if not int(formPort) == tool.port:
-            logging.info("tool_settings_update("+toolname+"): Port changed, reconnect required")
+            logging.info("tool_settings_update(" + toolname + "): Port changed, reconnect required")
             restartRequired = True
         if not int(formDeviceID) == tool.device_id:
-            logging.info("tool_settings_update("+toolname+"): DeviceID changed, reconnect required")
+            logging.info("tool_settings_update(" + toolname + "): DeviceID changed, reconnect required")
             restartRequired = True
         if not formPassive == tool.passive:
-            logging.info("tool_settings_update("+toolname+"): Passive changed, reconnect required")
+            logging.info("tool_settings_update(" + toolname + "): Passive changed, reconnect required")
             restartRequired = True
 
         if restartRequired:
@@ -95,13 +95,13 @@ def tool_settings_collectionevents(toolname):
     collectionEvents = []
 
     tool = models.Tool.query.filter(models.Tool.name == toolname).first()
-    toolType = helpers.getToolType(tool)
+    tool_connection = helpers.connectionManager[tool.name]
 
     for collection_event in tool.collection_events:
         collectionEvent = {}
         collectionEvent["ID"] = collection_event.ceid
-        if collection_event.ceid in toolType.ceids:
-            collectionEvent["name"] = toolType.ceids[collection_event.ceid]["name"]
+        if collection_event.ceid in tool_connection.collection_events:
+            collectionEvent["name"] = tool_connection.collection_events[collection_event.ceid]["name"]
         else:
             collectionEvent["name"] = str(collection_event.ceid)
 
@@ -110,8 +110,8 @@ def tool_settings_collectionevents(toolname):
             dataValue = {}
             dataValue["ID"] = dv.dvid
             
-            if dv.dvid in toolType.dvs:
-                dataValue["name"] = toolType.dvs[dv.dvid]["name"]
+            if dv.dvid in tool_connection.data_values:
+                dataValue["name"] = tool_connection.data_values[dv.dvid]["name"]
             else:
                 dataValue["name"] = str(dv.dvid)
 
@@ -127,12 +127,12 @@ def tool_settings_collectionevents(toolname):
 @app.route("/tools/<toolname>/settings/collectionevents/available")
 def tool_settings_collectionevent_available(toolname):
     tool = models.Tool.query.filter(models.Tool.name == toolname).first()
-    toolType = helpers.getToolType(tool)
+    tool_connection = helpers.connectionManager[tool.name]
 
     ceids = []
-    for ceid in toolType.ceids:
+    for ceid in tool_connection.collection_events:
         ce = {"id": str(ceid)}
-        ce.update(toolType.ceids[ceid])
+        ce.update(tool_connection.collection_events[ceid])
         ceids.append(ce)
 
     return json.dumps(ceids)
@@ -174,14 +174,14 @@ def tool_settings_collectionevent_delete(toolname, ceid):
 @app.route("/tools/<toolname>/settings/collectionevents/<ceid>/dataValue/available")
 def tool_settings_datavalue_available(toolname, ceid):
     tool = models.Tool.query.filter(models.Tool.name == toolname).first()
-    toolType = helpers.getToolType(tool)
+    tool_connection = helpers.connectionManager[tool.name]
 
     dvids = []
-    for ceidIterator in toolType.ceids:
+    for ceidIterator in tool_connection.collection_events:
         if int(ceidIterator) == int(ceid):
-            for dvid in toolType.ceids[ceidIterator]["dv"]:
+            for dvid in tool_connection.collection_events[ceidIterator]["dvids"]:
                 dv = {"id": str(dvid)}
-                dv.update(toolType.dvs[dvid])
+                dv.update(tool_connection.data_values[dvid])
                 dvids.append(dv)
 
     return json.dumps(dvids)
