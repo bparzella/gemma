@@ -15,12 +15,16 @@
 #####################################################################
 
 from app import app, helpers
+from secsgem.secs.variables import SecsVarU4, SecsVarString
 
 
 @app.route("/tools/<toolname>/sv/<svid>")
 def tool_sv(toolname, svid):
     handler = helpers.connectionManager[toolname]
-    result = handler.request_sv(int(svid))
+    if helpers.is_int(svid):
+        result = handler.request_sv(SecsVarU4(value=int(svid)))
+    else:
+        result = handler.request_sv(SecsVarString(value=svid))
 
     if isinstance(result, list):
         return str(result)

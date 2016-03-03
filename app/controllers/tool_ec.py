@@ -16,18 +16,29 @@
 
 from app import app, helpers
 from flask import request
+from secsgem.secs.variables import SecsVarU4, SecsVarString
 
 
 @app.route("/tools/<toolname>/ec/<ecid>", methods=['POST', 'GET'])
 def tool_ec(toolname, ecid):
     handler = helpers.connectionManager[toolname]
     if request.method == 'POST':
-        result = handler.request_ec(int(ecid)).format.data[0].value
+        if helpers.is_int(ecid):
+            result = handler.request_ec(SecsVarU4(value=int(ecid))).format.data[0].value
+        else:
+            result = handler.request_ec(SecsVarString(value=ecid)).format.data[0].value
         result.set(request.form["value"])
-        result = handler.set_ec(int(ecid), result)
+
+        if helpers.is_int(ecid):
+            result = handler.set_ec(SecsVarU4(value=int(ecid)), result)
+        else:
+            result = handler.set_ec(SecsVarString(value=ecid), result)
 
         return str(result)
     else:
-        result = handler.request_ec(int(ecid))[0]
+        if helpers.is_int(ecid):
+            result = handler.request_ec(SecsVarU4(value=int(ecid)))[0]
+        else:
+            result = handler.request_ec(SecsVarString(value=ecid))[0]
 
         return str(result)
