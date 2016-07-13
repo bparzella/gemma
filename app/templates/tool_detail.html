@@ -2,6 +2,18 @@
 {% block body %}
 <script type="text/javascript">
 
+function escapeXml(unsafe) {
+    return unsafe.replace(/[<>&'"]/g, function (c) {
+        switch (c) {
+            case '<': return '&lt;';
+            case '>': return '&gt;';
+            case '&': return '&amp;';
+            case '\'': return '&apos;';
+            case '"': return '&quot;';
+        }
+    });
+}
+
 function updateCollectionEventsTable() {
     $.getJSON('{{ url_for("tool_settings_collectionevents", toolname=tool.name) }}', function(collectionEvents){
         $('#toolCollectionEventsTable').find('tbody').empty();
@@ -415,7 +427,10 @@ $(document).ready(function(){
                     <script type="text/javascript">
                         $('#refreshSVID{{ svid.SVID }}').click(function(event){
                             event.preventDefault();
-                            $('#svid{{ svid.SVID }}').load(this.href)
+                            $.get(this.href, function( data ) {
+                                $('#svid{{ svid.SVID }}').html( escapeXml(data) );
+                            });
+                            //$('#svid{{ svid.SVID }}').load(this.href)
                         })
                     </script>
                 {% endfor %}
