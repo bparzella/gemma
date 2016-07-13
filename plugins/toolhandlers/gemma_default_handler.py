@@ -47,7 +47,7 @@ class gemma_default_handler(GemHostHandler):
         tool = models.Tool.query.filter(models.Tool.name == self.name).first()
 
         helpers.storeProcessProgram(tool.process_program_scope, message.PPID, message.PPBODY)
-        connection.sendResponse(self.stream_function(7, 4)(0), packet.header.system)
+        connection.send_response(self.stream_function(7, 4)(0), packet.header.system)
 
         data = {"processProgramScope": tool.process_program_scope, "processProgramID": message.PPID, "connection": self.connection, 'handler': self}
         self.fire_event("ProcessProgramStored", data)
@@ -69,7 +69,7 @@ class gemma_default_handler(GemHostHandler):
         data = helpers.getProcessProgram(tool.process_program_scope, message.get())
         
         if data:
-            connection.sendResponse(self.stream_function(7, 6)({"PPID": message.get(), "PPBODY": data}), packet.header.system)
+            connection.send_response(self.stream_function(7, 6)({"PPID": message.get(), "PPBODY": data}), packet.header.system)
 
         data = {"processProgramScope": tool.process_program_scope, "processProgramID": message.get(), "connection": self.connection, 'handler': self}
         self.fire_event("ProcessProgramRetrieved", data)
@@ -92,7 +92,7 @@ class gemma_default_handler(GemHostHandler):
 
         print s12f02
 
-        connection.sendResponse(s12f02, packet.header.system)
+        connection.send_response(s12f02, packet.header.system)
 
     def S12F3Handler(self, connection, packet):
         """Callback handler for Stream 12, Function 3, map setup data - request
@@ -130,7 +130,7 @@ class gemma_default_handler(GemHostHandler):
 
         print s12f04
 
-        connection.sendResponse(s12f04, packet.header.system)
+        connection.send_response(s12f04, packet.header.system)
 
     def S12F5Handler(self, connection, packet):
         """Callback handler for Stream 12, Function 5, map transmit inquire
@@ -150,7 +150,7 @@ class gemma_default_handler(GemHostHandler):
 
         print s12f06
 
-        connection.sendResponse(s12f06, packet.header.system)
+        connection.send_response(s12f06, packet.header.system)
 
     def S12F9Handler(self, connection, packet):
         """Callback handler for Stream 12, Function 9, map data type 2 - send
@@ -170,7 +170,7 @@ class gemma_default_handler(GemHostHandler):
 
         print s12f10
 
-        connection.sendResponse(s12f10, packet.header.system)
+        connection.send_response(s12f10, packet.header.system)
 
     def S12F15Handler(self, connection, packet):
         """Callback handler for Stream 12, Function 15, map data type 2 - request
@@ -199,4 +199,4 @@ class gemma_default_handler(GemHostHandler):
 
         s12f16.BINLT = binlt
 
-        connection.sendResponse(s12f16, packet.header.system)
+        connection.send_response(s12f16, packet.header.system)
