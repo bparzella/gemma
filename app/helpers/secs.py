@@ -33,9 +33,8 @@ def ceSetup(event, data):
     for collectionEvent in handler.registeredCollectionEvents:
         ceid = collectionEvent[0]
         dvids = collectionEvent[1]
-        if ceid in handler.collection_events:
-            handler.subscribe_collection_event(ceid, dvids)
-        else:
+        handler.subscribe_collection_event(ceid, dvids)
+        if ceid not in handler.collection_events:
             print "configured ceid %d not found" % (ceid)
 
 
