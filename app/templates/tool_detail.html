@@ -419,18 +419,18 @@ $(document).ready(function(){
                 <tr><th>SVID</th><th>Name</th><th>Value</th><th></th></tr>
                 {% for svid in svids %}
                     <tr>
-                        <td><small>{{ svid.SVID }}</small></td>
-                        <td><small>{{ svid.SVNAME }}</small></td>
-                        <td><small><span id="svid{{ svid.SVID }}">{{ svid.UNITS }}</span></small></td>
-                        <td><a id="refreshSVID{{ svid.SVID }}" href="{{ url_for('tool_sv', toolname=tool.name, svid=svid.SVID) }}"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></a></span></td>
+                        <td><small>{{ svid.SVID.get() }}</small></td>
+                        <td><small>{{ svid.SVNAME.get() }}</small></td>
+                        <td><small><span id="svid{{ svid.SVID.get() }}">{{ svid.UNITS.get() }}</span></small></td>
+                        <td><a id="refreshSVID{{ svid.SVID.get() }}" href="{{ url_for('tool_sv', toolname=tool.name, svid=svid.SVID.get()) }}"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></a></span></td>
                     </tr>
                     <script type="text/javascript">
-                        $('#refreshSVID{{ svid.SVID }}').click(function(event){
+                        $('#refreshSVID{{ svid.SVID.get() }}').click(function(event){
                             event.preventDefault();
                             $.get(this.href, function( data ) {
-                                $('#svid{{ svid.SVID }}').html( escapeXml(data) );
+                                $('#svid{{ svid.SVID.get() }}').html( escapeXml(data) );
                             });
-                            //$('#svid{{ svid.SVID }}').load(this.href)
+                            //$('#svid{{ svid.SVID.get() }}').load(this.href)
                         })
                     </script>
                 {% endfor %}
@@ -449,35 +449,35 @@ $(document).ready(function(){
                 <tr><th>ECID</th><th>Name</th><th>Min</th><th>Max</th><th>Def</th><th>Units</th><th>Value</th><th></th></tr>
                 {% for ecid in ecids %}
                     <tr>
-                        <td><small>{{ ecid.ECID }}</small></td>
-                        <td><small>{{ ecid.ECNAME }}</small></td>
-                        <td><small>{{ ecid.ECMIN }}</small></td>
-                        <td><small>{{ ecid.ECMAX }}</small></td>
-                        <td><small>{{ ecid.ECDEF }}</small></td>
-                        <td><small>{{ ecid.UNITS }}</small></td>
-                        <td><small><span id="valueECID{{ ecid.ECID }}"></span></small></td>
+                        <td><small>{{ ecid.ECID.get() }}</small></td>
+                        <td><small>{{ ecid.ECNAME.get() }}</small></td>
+                        <td><small>{{ ecid.ECMIN.get() }}</small></td>
+                        <td><small>{{ ecid.ECMAX.get() }}</small></td>
+                        <td><small>{{ ecid.ECDEF.get() }}</small></td>
+                        <td><small>{{ ecid.UNITS.get() }}</small></td>
+                        <td><small><span id="valueECID{{ ecid.ECID.get() }}"></span></small></td>
                         <td>
-                            <a id="editECID{{ ecid.ECID }}" href="{{ url_for('tool_ec', toolname=tool.name, ecid=ecid.ECID) }}"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></a></span>
-                            <a id="refreshECID{{ ecid.ECID }}" href="{{ url_for('tool_ec', toolname=tool.name, ecid=ecid.ECID) }}"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></a></span>
+                            <a id="editECID{{ ecid.ECID.get() }}" href="{{ url_for('tool_ec', toolname=tool.name, ecid=ecid.ECID.get()) }}"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></a></span>
+                            <a id="refreshECID{{ ecid.ECID.get() }}" href="{{ url_for('tool_ec', toolname=tool.name, ecid=ecid.ECID.get()) }}"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></a></span>
                         </td>
                     </tr>
                     <script type="text/javascript">
-                        $('#refreshECID{{ ecid.ECID }}').click(function(event){
+                        $('#refreshECID{{ ecid.ECID.get() }}').click(function(event){
                             event.preventDefault();
-                            $('#valueECID{{ ecid.ECID }}').load(this.href);
+                            $('#valueECID{{ ecid.ECID.get() }}').load(this.href);
                         })
 
-                        $('#editECID{{ ecid.ECID }}').click(function(event){
+                        $('#editECID{{ ecid.ECID.get() }}').click(function(event){
                             event.preventDefault();
-                            $('#valueECID{{ ecid.ECID }}').html('<form id="formECID{{ ecid.ECID }}" action="{{ url_for("tool_ec", toolname=tool.name, ecid=ecid.ECID) }}"><input id="inputECID{{ ecid.ECID }}" type="text"></form>');
-                            $("#inputECID{{ ecid.ECID }}").focus();
+                            $('#valueECID{{ ecid.ECID.get() }}').html('<form id="formECID{{ ecid.ECID.get() }}" action="{{ url_for("tool_ec", toolname=tool.name, ecid=ecid.ECID.get()) }}"><input id="inputECID{{ ecid.ECID.get() }}" type="text"></form>');
+                            $("#inputECID{{ ecid.ECID.get() }}").focus();
 
                             href=this.href;
 
-                            $("#formECID{{ ecid.ECID }}" ).submit(function( event ) {
-                                val = $("#inputECID{{ ecid.ECID }}").val();
+                            $("#formECID{{ ecid.ECID.get() }}" ).submit(function( event ) {
+                                val = $("#inputECID{{ ecid.ECID.get() }}").val();
                                 $.post(href, 'value=' + val , function( data ) {
-                                    $('#valueECID{{ ecid.ECID }}').load(href);
+                                    $('#valueECID{{ ecid.ECID.get() }}').load(href);
                                 });
                                 event.preventDefault();
                             });

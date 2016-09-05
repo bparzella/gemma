@@ -22,9 +22,9 @@ from secsgem.secs.variables import SecsVarU4, SecsVarString
 def tool_sv(toolname, svid):
     handler = helpers.connectionManager[toolname]
     if helpers.is_int(svid):
-        result = handler.request_sv(SecsVarU4(value=int(svid)))
+        result = handler.request_sv(SecsVarU4(int(svid))).get()
     else:
-        result = handler.request_sv(SecsVarString(value=svid))
+        result = handler.request_sv(SecsVarString(svid)).get()
 
     if isinstance(result, list):
         return str(result)

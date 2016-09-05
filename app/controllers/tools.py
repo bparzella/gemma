@@ -31,8 +31,8 @@ def tool_detail(toolname):
     tool = models.Tool.query.filter(models.Tool.name == toolname).first()
 
     if handler and handler.connection.connected:
-        SVs = sorted(handler.list_svs(), key=lambda SV: SV.SVID)
-        ECs = sorted(handler.list_ecs(), key=lambda EC: EC.ECID)
+        SVs = sorted(handler.list_svs(), key=lambda SV: SV.SVID.get())
+        ECs = sorted(handler.list_ecs(), key=lambda EC: EC.ECID.get())
     else:
         SVs = {}
         ECs = {}

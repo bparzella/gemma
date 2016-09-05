@@ -24,21 +24,21 @@ def tool_ec(toolname, ecid):
     handler = helpers.connectionManager[toolname]
     if request.method == 'POST':
         if helpers.is_int(ecid):
-            result = handler.request_ec(SecsVarU4(value=int(ecid))).format.data[0].value
+            result = handler.request_ec(SecsVarU4(int(ecid))).data[0].value
         else:
-            result = handler.request_ec(SecsVarString(value=ecid)).format.data[0].value
+            result = handler.request_ec(SecsVarString(ecid)).data[0].value
         result.set(request.form["value"])
 
         if helpers.is_int(ecid):
-            result = handler.set_ec(SecsVarU4(value=int(ecid)), result)
+            result = handler.set_ec(SecsVarU4(int(ecid)), result)
         else:
-            result = handler.set_ec(SecsVarString(value=ecid), result)
+            result = handler.set_ec(SecsVarString(ecid), result)
 
         return str(result)
     else:
         if helpers.is_int(ecid):
-            result = handler.request_ec(SecsVarU4(value=int(ecid)))[0]
+            result = handler.request_ec(SecsVarU4(int(ecid)))[0].get()
         else:
-            result = handler.request_ec(SecsVarString(value=ecid))[0]
+            result = handler.request_ec(SecsVarString(ecid))[0].get()
 
         return str(result)
